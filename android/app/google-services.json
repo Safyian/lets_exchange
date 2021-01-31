@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "316303816216",
+    "project_id": "let-s-exchange-e911a",
+    "storage_bucket": "let-s-exchange-e911a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316303816216:android:4323ca19fc15ac7851b56d",
+        "android_client_info": {
+          "package_name": "com.example.lets_exchange"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316303816216-jeanqp3vbc32rafrja0nbpr7quc44g3r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg_bZTKqtouOc05N3dieSq9NI_T_0LXc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "316303816216-jeanqp3vbc32rafrja0nbpr7quc44g3r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
