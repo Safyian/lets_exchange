@@ -49,7 +49,7 @@ class _SignUpState extends State<SignUp> {
                 Container(
                     width: Get.width * 0.35,
                     height: Get.width * 0.35,
-                    child: Image.asset(Constant().logo)),
+                    child: Image.asset(Constant.logo)),
 
                 // ********* Name Text Field *********
                 Container(
@@ -99,7 +99,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
 
-                // ********* _passController Text Field *********
+                // ********* Password Text Field *********
                 Container(
                   width: Get.width * 0.9,
                   child: Padding(
@@ -114,7 +114,7 @@ class _SignUpState extends State<SignUp> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        hintText: '_passController',
+                        labelText: 'Password',
                         prefixIcon: Icon(Icons.lock),
                         suffixIcon: GestureDetector(
                             onTap: () {
@@ -148,18 +148,26 @@ class _SignUpState extends State<SignUp> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_emailController.text.isEmpty &&
-                          _passController.text.isEmpty) {
-                        Get.snackbar('Empty!', 'Please Enter required Fields',
-                            snackPosition: SnackPosition.BOTTOM);
-                      } else if (_emailController.text.isEmpty &&
-                          _passController.text.isNotEmpty) {
-                        Get.snackbar('Empty!', 'Please Enter your Email',
-                            snackPosition: SnackPosition.BOTTOM);
-                      } else if (_emailController.text.isNotEmpty &&
-                          _passController.text.isEmpty) {
-                        Get.snackbar('Empty!', 'Please Enter _passController',
-                            snackPosition: SnackPosition.BOTTOM);
-                      } else if (_emailController.text.isNotEmpty &&
+                          _passController.text.isEmpty &&
+                          _nameController.text.isEmail)
+                        Authentication.showError(
+                            'Empty', 'Please Enter required Fields');
+                      else if (_nameController.text.isEmpty &&
+                          _emailController.text.isNotEmpty &&
+                          _passController.text.isNotEmpty)
+                        Authentication.showError(
+                            'Empty', 'Please Enter your Name');
+                      else if (_nameController.text.isNotEmpty &&
+                          _emailController.text.isEmpty &&
+                          _passController.text.isNotEmpty)
+                        Authentication.showError(
+                            'Empty', 'Please Enter your Email');
+                      else if (_nameController.text.isNotEmpty &&
+                          _emailController.text.isNotEmpty &&
+                          _passController.text.isEmpty)
+                        Authentication.showError(
+                            'Empty', 'Please enter your password');
+                      else if (_emailController.text.isNotEmpty &&
                           _passController.text.isNotEmpty) {
                         Authentication().signUp(
                             _emailController.text, _passController.text);

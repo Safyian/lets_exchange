@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                     width: Get.width * 0.35,
                     height: Get.width * 0.35,
-                    child: Image.asset(Constant().logo)),
+                    child: Image.asset(Constant.logo)),
 
                 // ********* Email Text Field *********
                 Container(
@@ -114,16 +114,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       if (_emailController.text.isEmpty &&
                           _passController.text.isEmpty) {
-                        Get.snackbar('Empty!', 'Please Enter required Fields',
-                            snackPosition: SnackPosition.BOTTOM);
+                        Authentication.showError(
+                            'Empty', 'Please Enter required Fields');
                       } else if (_emailController.text.isEmpty &&
                           _passController.text.isNotEmpty) {
-                        Get.snackbar('Empty!', 'Please Enter your Email',
-                            snackPosition: SnackPosition.BOTTOM);
+                        Authentication.showError(
+                            'Empty', 'Please Enter your Email');
                       } else if (_emailController.text.isNotEmpty &&
                           _passController.text.isEmpty) {
-                        Get.snackbar('Empty!', 'Please Enter Password',
-                            snackPosition: SnackPosition.BOTTOM);
+                        Authentication.showError(
+                            'Empty', 'Please Enter Password');
                       } else if (_emailController.text.isNotEmpty &&
                           _passController.text.isNotEmpty) {
                         Authentication()
