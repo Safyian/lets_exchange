@@ -170,7 +170,9 @@ class _SignUpState extends State<SignUp> {
                       else if (_emailController.text.isNotEmpty &&
                           _passController.text.isNotEmpty) {
                         Authentication().signUp(
-                            _emailController.text, _passController.text);
+                            name: _nameController.text,
+                            email: _emailController.text,
+                            pass: _passController.text);
                       }
                     },
                     child: Text(

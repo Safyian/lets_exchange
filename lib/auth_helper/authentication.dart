@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,8 +9,8 @@ import 'package:lets_exchange/screens/login.dart';
 class Authentication {
   static FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // ******* Sing up method *******
-  signUp(String email, String pass) async {
+  // ******* Sign up method *******
+  signUp({String name, String email, String pass}) async {
     try {
       if (validatePassword(pass) == true) {
         Get.defaultDialog(
@@ -22,6 +23,15 @@ class Authentication {
         final User user = result.user;
 
         if (user != null) {
+          // ****** Storing User Data ******
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+            'uid': user.uid,
+            'name': name,
+            'email': email,
+          });
           Get.back();
           showError('Success', 'Account created Successfully!');
           Future.delayed(Duration(seconds: 3)).then((value) => Get.back());

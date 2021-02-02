@@ -9,6 +9,9 @@ void main() async {
   runApp(
     GetMaterialApp(
       home: SplashScreen(),
+      // theme: new ThemeData(
+      //   primarySwatch: Colors.blue, // Your app THEME-COLOR
+      // ),
       debugShowCheckedModeBanner: false,
     ),
   );

@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/const/const.dart';
+import 'package:lets_exchange/screens/home_screen.dart';
 import 'package:lets_exchange/screens/login.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,8 +14,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 3))
-        .then((value) => Get.off(LoginScreen()));
+    Future.delayed(Duration(seconds: 3)).then((value) => checkUser());
     super.initState();
   }
 
@@ -36,7 +38,14 @@ class _SplashScreenState extends State<SplashScreen> {
           Center(
             child: Text(
               "Let's Exchange",
-              style: TextStyle(color: Colors.black, fontSize: Get.width * 0.06),
+              style: GoogleFonts.permanentMarker(
+                // color: Colors.white,
+                fontSize: Get.width * 0.06,
+                foreground: Paint()
+                  ..style = PaintingStyle.stroke
+                  ..strokeWidth = 1.0
+                  ..color = Colors.black,
+              ),
             ),
           ),
           SizedBox(
@@ -46,5 +55,13 @@ class _SplashScreenState extends State<SplashScreen> {
         ],
       ),
     );
+  }
+
+  checkUser() {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Get.off(HomeScreen());
+    } else
+      Get.off(LoginScreen());
   }
 }
