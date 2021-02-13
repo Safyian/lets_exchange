@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/const/const.dart';
 
@@ -9,24 +15,97 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  TextEditingController _nameController;
-  TextEditingController _emailController;
-  TextEditingController _passController;
+  TextEditingController _name;
+  TextEditingController _email;
+  TextEditingController _pass;
+  final _formKey = GlobalKey<FormState>();
   bool showPass = false;
+  File _image;
+  File _cropImage;
+  final picker = ImagePicker();
+
+//************** ImagePicker from Camera  ************/
+  _imgFromCamera() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 50);
+
+    setState(() {
+      _image = image;
+    });
+
+    // ****** Crop Image *****
+    if (_image != null) {
+      _imgCropper();
+    }
+  }
+
+  //************** ImagePicker from Gallery  ************/
+  _imgFromGallery() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50);
+
+    setState(() {
+      _image = image;
+    });
+
+    // ****** Crop Image *****
+    if (_image != null) {
+      _imgCropper();
+    }
+  }
+
+  // ********** Image Cropper *******/
+  _imgCropper() async {
+    File cropped = await ImageCropper.cropImage(
+      sourcePath: _image.path,
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      compressQuality: 10,
+      compressFormat: ImageCompressFormat.png,
+      cropStyle: CropStyle.rectangle,
+    );
+    this.setState(() {
+      _cropImage = cropped;
+    });
+  }
+
+  // ********** Bottom Sheet *******/
+  void showPicker() {
+    Get.bottomSheet(
+      Container(
+        color: Colors.white,
+        child: new Wrap(
+          children: <Widget>[
+            new ListTile(
+                leading: new Icon(Icons.photo_library),
+                title: new Text('Photo Library'),
+                onTap: () {
+                  _imgFromGallery();
+                  Get.back();
+                }),
+            new ListTile(
+              leading: new Icon(Icons.photo_camera),
+              title: new Text('Camera'),
+              onTap: () {
+                _imgFromCamera();
+                Get.back();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
-    _nameController = TextEditingController();
-    _emailController = TextEditingController();
-    _passController = TextEditingController();
+    _name = TextEditingController();
+    _email = TextEditingController();
+    _pass = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _nameController.clear();
-    _emailController.clear();
-    _passController.clear();
     super.dispose();
   }
 
@@ -35,13 +114,37 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Sign up'),
+        title: Text(
+          Constant.appName,
+          style: GoogleFonts.permanentMarker(fontSize: Get.width * 0.06),
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: new BoxDecoration(
+            gradient: new LinearGradient(
+              colors: [
+                const Color(0xFF00CCFF),
+                const Color(0xFF3366FF),
+              ],
+              begin: Alignment.bottomRight,
+              end: Alignment.topLeft,
+            ),
+          ),
+        ),
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: Center(
-          child: SingleChildScrollView(
+      body: signUpBody(),
+    );
+  }
+
+// ******** SignUp body widgets Ui *******
+  Container signUpBody() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      child: Center(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -51,26 +154,65 @@ class _SignUpState extends State<SignUp> {
                     height: Get.width * 0.35,
                     child: Image.asset(Constant.logo)),
 
+                // ********* Profile Image *******
+                Padding(
+                  padding: EdgeInsets.only(bottom: 12.0),
+                  child: GestureDetector(
+                    onTap: () => showPicker(),
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          // begin: Alignment.topRight,
+                          // end: Alignment.bottomLeft,
+                          colors: [
+                            // Colors.blue,
+                            // Colors.red,
+                            Color(0XFF667db6),
+                            Color(0XFF0082c8),
+                            Color(0XFF0082c8),
+                            Color(0XFF667db6),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: _cropImage != null
+                          ? ClipOval(
+                              child: Image.file(_cropImage),
+                            )
+                          : Center(
+                              child: Text(
+                              'Profile Picture',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            )),
+                    ),
+                  ),
+                ),
                 // ********* Name Text Field *********
                 Container(
                   width: Get.width * 0.9,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 12.0),
                     child: TextFormField(
-                      controller: _nameController,
-                      onChanged: (val) {
-                        val = _nameController.text.toString();
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                      controller: _name,
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: inputDecoration.copyWith(
                         hintText: 'xyz',
-                        hintStyle: TextStyle(color: Colors.grey),
                         labelText: 'Name',
                         prefixIcon: Icon(Icons.person),
                       ),
-                      keyboardType: TextInputType.name,
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return 'Please enter your Name';
+                        } else
+                          return null;
+                      },
                     ),
                   ),
                 ),
@@ -81,20 +223,23 @@ class _SignUpState extends State<SignUp> {
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 12.0),
                     child: TextFormField(
-                      controller: _emailController,
-                      onChanged: (val) {
-                        val = _emailController.text.toString();
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        hintText: 'xyz@abc.com',
-                        hintStyle: TextStyle(color: Colors.grey),
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                      ),
+                      controller: _email,
+                      textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.emailAddress,
+                      decoration: inputDecoration.copyWith(
+                          hintText: 'abc@xyz.com',
+                          labelText: 'Email',
+                          prefixIcon: Icon(Icons.email)),
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return 'Please enter your Email';
+                        } else if (EmailValidator.validate(val) == false) {
+                          return 'Please enter valid Email';
+                        } else if (EmailValidator.validate(val)) {
+                          return null;
+                        } else
+                          return null;
+                      },
                     ),
                   ),
                 ),
@@ -105,10 +250,9 @@ class _SignUpState extends State<SignUp> {
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 12.0),
                     child: TextFormField(
-                      controller: _passController,
-                      onChanged: (val) {
-                        val = _passController.text.toString();
-                      },
+                      controller: _pass,
+                      textInputAction: TextInputAction.done,
+                      keyboardType: TextInputType.text,
                       obscureText: showPass ? false : true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -127,6 +271,20 @@ class _SignUpState extends State<SignUp> {
                                 ? Icon(Icons.visibility)
                                 : Icon(Icons.visibility_off)),
                       ),
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return 'Please enter a Password';
+                        } else if (val.length < 6) {
+                          return 'Password must be greater than 5 character';
+                        } else if (Authentication().validatePassword(val) ==
+                            false) {
+                          return 'Password must contain Uppercase & Lowercase letter';
+                        } else if (Authentication().validatePassword(val) ==
+                            true) {
+                          return null;
+                        } else
+                          return null;
+                      },
                     ),
                   ),
                 ),
@@ -146,35 +304,7 @@ class _SignUpState extends State<SignUp> {
                   width: Get.width * 0.4,
                   height: Get.height * 0.05,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_emailController.text.isEmpty &&
-                          _passController.text.isEmpty &&
-                          _nameController.text.isEmail)
-                        Authentication.showError(
-                            'Empty', 'Please Enter required Fields');
-                      else if (_nameController.text.isEmpty &&
-                          _emailController.text.isNotEmpty &&
-                          _passController.text.isNotEmpty)
-                        Authentication.showError(
-                            'Empty', 'Please Enter your Name');
-                      else if (_nameController.text.isNotEmpty &&
-                          _emailController.text.isEmpty &&
-                          _passController.text.isNotEmpty)
-                        Authentication.showError(
-                            'Empty', 'Please Enter your Email');
-                      else if (_nameController.text.isNotEmpty &&
-                          _emailController.text.isNotEmpty &&
-                          _passController.text.isEmpty)
-                        Authentication.showError(
-                            'Empty', 'Please enter your password');
-                      else if (_emailController.text.isNotEmpty &&
-                          _passController.text.isNotEmpty) {
-                        Authentication().signUp(
-                            name: _nameController.text,
-                            email: _emailController.text,
-                            pass: _passController.text);
-                      }
-                    },
+                    onPressed: signUp,
                     child: Text(
                       'Sign up',
                       style: TextStyle(
@@ -189,5 +319,21 @@ class _SignUpState extends State<SignUp> {
         ),
       ),
     );
+  }
+
+// ******** Sign up Authentication method *******
+  signUp() {
+    if (_formKey.currentState.validate()) {
+      if (_cropImage != null) {
+        Authentication().signUp(
+            name: _name.text.trim(),
+            email: _email.text.trim(),
+            pass: _pass.text.trim(),
+            file: _cropImage);
+      }
+      if (_cropImage == null) {
+        Authentication.showError('Empty', 'Please select your image');
+      }
+    }
   }
 }

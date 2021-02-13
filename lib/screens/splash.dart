@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,9 +58,21 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  checkUser() {
+  checkUser() async {
     var user = FirebaseAuth.instance.currentUser;
     if (user != null) {
+      // ****** Storing user Info ******
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((value) {
+        print('value = ${value.data()['image']}');
+        Constant.userId = value.data()['uid'];
+        Constant.userEmail = value.data()['email'];
+        Constant.userName = value.data()['name'];
+        Constant.userImage = value.data()['image'];
+      });
       Get.off(HomeScreen());
     } else
       Get.off(LoginScreen());
