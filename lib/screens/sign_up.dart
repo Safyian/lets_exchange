@@ -162,22 +162,9 @@ class _SignUpState extends State<SignUp> {
                     child: Container(
                       width: 120,
                       height: 120,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          // begin: Alignment.topRight,
-                          // end: Alignment.bottomLeft,
-                          colors: [
-                            // Colors.blue,
-                            // Colors.red,
-                            Color(0XFF667db6),
-                            Color(0XFF0082c8),
-                            Color(0XFF0082c8),
-                            Color(0XFF667db6),
-                          ],
-                        ),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey),
-                      ),
+                      decoration: customDecoration.copyWith(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.blue)),
                       child: _cropImage != null
                           ? ClipOval(
                               child: Image.file(_cropImage),
@@ -203,9 +190,11 @@ class _SignUpState extends State<SignUp> {
                       keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.words,
                       decoration: inputDecoration.copyWith(
-                        hintText: 'xyz',
                         labelText: 'Name',
-                        prefixIcon: Icon(Icons.person),
+                        prefixIcon: Icon(
+                          Icons.person,
+                          color: Colors.blue,
+                        ),
                       ),
                       validator: (val) {
                         if (val.isEmpty) {
@@ -227,9 +216,11 @@ class _SignUpState extends State<SignUp> {
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.emailAddress,
                       decoration: inputDecoration.copyWith(
-                          hintText: 'abc@xyz.com',
                           labelText: 'Email',
-                          prefixIcon: Icon(Icons.email)),
+                          prefixIcon: Icon(
+                            Icons.email,
+                            color: Colors.blue,
+                          )),
                       validator: (val) {
                         if (val.isEmpty) {
                           return 'Please enter your Email';
@@ -251,37 +242,28 @@ class _SignUpState extends State<SignUp> {
                     padding: EdgeInsets.only(bottom: 12.0),
                     child: TextFormField(
                       controller: _pass,
-                      textInputAction: TextInputAction.done,
-                      keyboardType: TextInputType.text,
                       obscureText: showPass ? false : true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: GestureDetector(
-                            onTap: () {
-                              print('object');
-                              setState(() {
-                                showPass = !showPass;
-                              });
-                            },
-                            child: showPass
-                                ? Icon(Icons.visibility)
-                                : Icon(Icons.visibility_off)),
-                      ),
+                      decoration: inputDecoration.copyWith(
+                          labelText: 'Password',
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: Colors.blue,
+                          ),
+                          suffixIcon: GestureDetector(
+                              onTap: () {
+                                print('object');
+                                setState(() {
+                                  showPass = !showPass;
+                                });
+                              },
+                              child: showPass
+                                  ? Icon(
+                                      Icons.visibility,
+                                    )
+                                  : Icon(Icons.visibility_off))),
                       validator: (val) {
                         if (val.isEmpty) {
                           return 'Please enter a Password';
-                        } else if (val.length < 6) {
-                          return 'Password must be greater than 5 character';
-                        } else if (Authentication().validatePassword(val) ==
-                            false) {
-                          return 'Password must contain Uppercase & Lowercase letter';
-                        } else if (Authentication().validatePassword(val) ==
-                            true) {
-                          return null;
                         } else
                           return null;
                       },

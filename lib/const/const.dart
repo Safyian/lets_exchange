@@ -16,11 +16,28 @@ class Constant {
 InputDecoration inputDecoration = InputDecoration(
   border: OutlineInputBorder(
     borderRadius: BorderRadius.circular(20),
+    borderSide: BorderSide(color: Colors.blue, width: 1.0),
   ),
-  hintText: 'xyz@abc.com',
-  hintStyle: TextStyle(color: Colors.grey),
-  labelText: 'Email',
-  prefixIcon: Icon(Icons.email),
+  focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(
+        color: Colors.blue,
+        width: 1.0,
+      )),
+  enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(
+        color: Colors.blue,
+        width: 1.0,
+      )),
+  // hintText: 'xyz@abc.com',
+  hintStyle: TextStyle(color: Colors.black54),
+  // labelText: 'Email',
+  labelStyle: TextStyle(color: Colors.black54),
+  // prefixIcon: Icon(
+  //   Icons.email,
+  //   color: Colors.blue,
+  // ),
 );
 
 // ******** Gradient Color *********
@@ -29,6 +46,16 @@ BoxDecoration customDecoration = BoxDecoration(
     colors: [
       const Color(0xFF00CCFF),
       const Color(0xFF3366FF),
+    ],
+    begin: Alignment.bottomRight,
+    end: Alignment.topLeft,
+  ),
+);
+BoxDecoration customDecoration2 = BoxDecoration(
+  gradient: new LinearGradient(
+    colors: [
+      const Color(0xFF8e9eab),
+      const Color(0xFFeef2f3),
     ],
     begin: Alignment.bottomRight,
     end: Alignment.topLeft,

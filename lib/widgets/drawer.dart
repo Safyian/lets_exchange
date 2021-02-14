@@ -55,16 +55,6 @@ class CustomDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            // InkWell(
-            //   onTap: () {},
-            //   child: ListTile(
-            //     title: Text('My Account'),
-            //     leading: Icon(
-            //       Icons.person,
-            //       color: Colors.blue,
-            //     ),
-            //   ),
-            // ),
             InkWell(
               onTap: () {
                 Get.to(AddProduct());

@@ -84,9 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextFormField(
                       controller: _emailController,
                       decoration: inputDecoration.copyWith(
-                          hintText: 'abc@xyz.com',
                           labelText: 'Email',
-                          prefixIcon: Icon(Icons.email)),
+                          prefixIcon: Icon(
+                            Icons.email,
+                            color: Colors.blue,
+                          )),
                       keyboardType: TextInputType.emailAddress,
                       validator: (val) {
                         if (val.isEmpty) {
@@ -110,23 +112,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextFormField(
                       controller: _passController,
                       obscureText: showPass ? false : true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        hintText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: GestureDetector(
-                            onTap: () {
-                              print('object');
-                              setState(() {
-                                showPass = !showPass;
-                              });
-                            },
-                            child: showPass
-                                ? Icon(Icons.visibility)
-                                : Icon(Icons.visibility_off)),
-                      ),
+                      decoration: inputDecoration.copyWith(
+                          labelText: 'Password',
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: Colors.blue,
+                          ),
+                          suffixIcon: GestureDetector(
+                              onTap: () {
+                                print('object');
+                                setState(() {
+                                  showPass = !showPass;
+                                });
+                              },
+                              child: showPass
+                                  ? Icon(
+                                      Icons.visibility,
+                                    )
+                                  : Icon(Icons.visibility_off))),
                       validator: (val) {
                         if (val.isEmpty) {
                           return 'Please enter a Password';
