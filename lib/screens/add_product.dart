@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:lets_exchange/screens/pick_address_from_map.dart';
+import 'package:location/location.dart';
 
 class AddProduct extends StatefulWidget {
   @override
@@ -14,6 +18,17 @@ class _AddProductState extends State<AddProduct> {
   TextEditingController _prodName;
   TextEditingController _prodDescription;
   TextEditingController _prodPrice;
+  List<double> address = [0.0, 0.0];
+  List catagoryList = [
+    'Kitchen Accessories',
+    'Home Accessories',
+    'Computers & Mobiles',
+    'Games',
+    'Audio & Video',
+    'Other'
+  ];
+  String catagory;
+  double _value = 1.0;
 
   @override
   void initState() {
@@ -151,6 +166,95 @@ class _AddProductState extends State<AddProduct> {
                   preIcon: Ionicons.md_pricetag,
                   keyType: TextInputType.number,
                 ),
+                // ******** Catagory ******
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 2.5, 25, 2.5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue, width: 1.0),
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      color: Colors.white,
+                    ),
+                    child: DropdownButton(
+                      value: catagory,
+                      onChanged: (value) {
+                        setState(() {
+                          catagory = value;
+                        });
+                      },
+                      isExpanded: true,
+                      underline: Container(),
+                      hint: Text(
+                        'Select a Catagory',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                      items: catagoryList.map((religionValue) {
+                        return DropdownMenuItem(
+                          value: religionValue,
+                          child: Text(religionValue),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+
+                // ********** Select From MAp Button *********
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width / 30,
+                      right: MediaQuery.of(context).size.width / 30,
+                      top: MediaQuery.of(context).size.width / 40),
+                  child: _AddressBtn(
+                    text: 'Select from Map',
+                    onTap: () async {
+                      bool locationStatus = await Location().serviceEnabled();
+                      if (locationStatus) {
+                        address = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => PickAddressFromMap()));
+                      } else {
+                        Authentication.showError(
+                            'Error', 'Please turn on location');
+                      }
+
+                      if (mounted) {
+                        setState(() {
+                          // long.text = address[1].toString();
+                          // lat.text = address[0].toString();
+                        });
+                      }
+
+                      // if (address != null) {
+                      //   setState(() {
+                      //     businessAddress = address;
+                      //   });
+                      //   await helper.saveAddress(address);
+                      // }
+                    },
+                  ),
+                ),
+
+                // ********* Quantity Slider ********
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                  ),
+                  child: Slider(
+                    value: _value,
+                    min: 1.0,
+                    max: 100.0,
+                    divisions: 100,
+                    label: '${_value.toInt()}',
+                    onChanged: (value) {
+                      setState(
+                        () {
+                          _value = value;
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -159,11 +263,13 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
-  Padding customInputField(
-      {TextEditingController controller,
-      String label,
-      IconData preIcon,
-      TextInputType keyType}) {
+  // ******** TextFormField *******
+  Padding customInputField({
+    TextEditingController controller,
+    String label,
+    IconData preIcon,
+    TextInputType keyType,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
@@ -182,6 +288,43 @@ class _AddProductState extends State<AddProduct> {
         },
         keyboardType: keyType,
         textCapitalization: TextCapitalization.sentences,
+      ),
+    );
+  }
+}
+
+// Button Select on Map
+class _AddressBtn extends StatelessWidget {
+  final String text;
+  final Function onTap;
+  const _AddressBtn({
+    @required this.text,
+    @required this.onTap,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 3,
+              color: Colors.grey,
+            ),
+          ],
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: MediaQuery.of(context).size.width * 0.045,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ),
     );
   }
