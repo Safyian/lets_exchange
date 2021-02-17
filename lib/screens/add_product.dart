@@ -29,6 +29,7 @@ class _AddProductState extends State<AddProduct> {
   ];
   String catagory;
   double _value = 1.0;
+  int quantity = 1;
 
   @override
   void initState() {
@@ -153,11 +154,55 @@ class _AddProductState extends State<AddProduct> {
                   keyType: TextInputType.text,
                 ),
                 // ********* Product Description **********
-                customInputField(
-                  controller: _prodDescription,
-                  label: 'Product Description',
-                  preIcon: Icons.description,
-                  keyType: TextInputType.text,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: (Get.height / 100) * 30,
+                    // child: customInputField(
+                    //   controller: _prodDescription,
+                    //   label: 'Product Description',
+                    //   preIcon: Icons.description,
+                    //   keyType: TextInputType.text,
+                    // ),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.blue)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: _prodDescription,
+                        decoration: InputDecoration(
+                          hintText: 'Product Description ...',
+                          prefixIcon: Icon(
+                            Icons.description,
+                            color: Colors.blue,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.transparent)),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.transparent)),
+                        ),
+                        // decoration: inputDecoration.copyWith(
+                        //     labelText: 'Product Description',
+                        //     prefixIcon: Icon(
+                        //       Icons.description,
+                        //       color: Colors.blue,
+                        //     )),
+                        validator: (val) {
+                          if (val.isEmpty) {
+                            return 'Please enter a Password';
+                          } else
+                            return null;
+                        },
+                        keyboardType: TextInputType.text,
+                        textCapitalization: TextCapitalization.sentences,
+
+                        maxLines: null,
+                      ),
+                    ),
+                  ),
                 ),
                 // ********* Product Name **********
                 customInputField(
@@ -166,7 +211,7 @@ class _AddProductState extends State<AddProduct> {
                   preIcon: Ionicons.md_pricetag,
                   keyType: TextInputType.number,
                 ),
-                // ******** Catagory ******
+                // ******** Catagory DropDown ******
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -199,14 +244,11 @@ class _AddProductState extends State<AddProduct> {
                   ),
                 ),
 
-                // ********** Select From MAp Button *********
+                // ********** Select From Map Button *********
                 Padding(
-                  padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width / 30,
-                      right: MediaQuery.of(context).size.width / 30,
-                      top: MediaQuery.of(context).size.width / 40),
+                  padding: const EdgeInsets.all(8.0),
                   child: _AddressBtn(
-                    text: 'Select from Map',
+                    text: 'Select your Location',
                     onTap: () async {
                       bool locationStatus = await Location().serviceEnabled();
                       if (locationStatus) {
@@ -236,29 +278,102 @@ class _AddProductState extends State<AddProduct> {
                 ),
 
                 // ********* Quantity Slider ********
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Quantity: ',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: (Get.width / 100) * 4.5),
+                      ),
+                      // ******** Decrement *******
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            quantity > 1 ? quantity-- : quantity = 1;
+
+                            setState(() {
+                              print(quantity);
+                            });
+                          },
+                          child: quantityContainer(MaterialIcons.remove),
+                        ),
+                      ),
+
+                      // ********* Quantity value *******
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: (Get.width / 100) * 20.0,
+                          height: (Get.width / 100) * 16.0,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: Border.all(
+                                color: Colors.blue,
+                              )),
+                          child: Text(
+                            quantity.toString(),
+                            style: TextStyle(fontSize: Get.width * 0.045),
+                          ),
+                        ),
+                      ),
+                      // ******** increament *******
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            print(quantity);
+                            quantity++;
+                            print(quantity);
+                            setState(() {});
+                          },
+                          child: quantityContainer(
+                            MaterialIcons.add,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Slider(
-                    value: _value,
-                    min: 1.0,
-                    max: 100.0,
-                    divisions: 100,
-                    label: '${_value.toInt()}',
-                    onChanged: (value) {
-                      setState(
-                        () {
-                          _value = value;
-                        },
-                      );
-                    },
+                ),
+
+                // *********** Post Add Button *******
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: Get.width * 0.8,
+                    height: (Get.height / 100) * 6,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text(
+                        'POST AD',
+                        style: TextStyle(fontSize: Get.width * 0.05),
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Container quantityContainer(IconData icon) {
+    return Container(
+      width: (Get.width / 100) * 12.0,
+      height: (Get.width / 100) * 12.0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.black,
+      ),
+      child: Icon(
+        icon,
+        color: Colors.white,
       ),
     );
   }
@@ -293,7 +408,7 @@ class _AddProductState extends State<AddProduct> {
   }
 }
 
-// Button Select on Map
+// Button Select your location
 class _AddressBtn extends StatelessWidget {
   final String text;
   final Function onTap;
@@ -310,20 +425,33 @@ class _AddressBtn extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 3,
-              color: Colors.grey,
+          border: Border.all(
+            color: Colors.blue,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          // boxShadow: [
+          //   BoxShadow(
+          //     blurRadius: 3,
+          //     color: Colors.grey,
+          //   ),
+          // ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              MaterialIcons.location_on,
+              color: Colors.red[700],
+            ),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.045,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ],
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: MediaQuery.of(context).size.width * 0.045,
-            fontWeight: FontWeight.w400,
-          ),
         ),
       ),
     );
