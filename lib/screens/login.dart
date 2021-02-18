@@ -34,22 +34,30 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          Constant.appName,
-          style: GoogleFonts.permanentMarker(fontSize: Get.width * 0.06),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: new BoxDecoration(
-            gradient: new LinearGradient(
-              colors: [
-                const Color(0xFF00CCFF),
-                const Color(0xFF3366FF),
+      backgroundColor: Constant.background,
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width,
+            MediaQuery.of(context).size.height / 10),
+        child: AppBar(
+          elevation: 0.0,
+          leading: Container(),
+          flexibleSpace: Container(
+            color: Constant.primary,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 22.0,
+                  ),
+                  child: Text(Constant.appName,
+                      style: GoogleFonts.pacifico(
+                        color: Constant.iconColor,
+                        fontSize: Get.width * 0.055,
+                        // fontWeight: FontWeight.bold,
+                      )),
+                ),
               ],
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
             ),
           ),
         ),
@@ -85,10 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _emailController,
                       decoration: inputDecoration.copyWith(
                           labelText: 'Email',
-                          prefixIcon: Icon(
-                            Icons.email,
-                            color: Colors.blue,
-                          )),
+                          prefixIcon: Icon(Icons.email,
+                              color: Constant.btnWidgetColor)),
                       keyboardType: TextInputType.emailAddress,
                       validator: (val) {
                         if (val.isEmpty) {
@@ -114,10 +120,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: showPass ? false : true,
                       decoration: inputDecoration.copyWith(
                           labelText: 'Password',
-                          prefixIcon: Icon(
-                            Icons.lock,
-                            color: Colors.blue,
-                          ),
+                          prefixIcon:
+                              Icon(Icons.lock, color: Constant.btnWidgetColor),
                           suffixIcon: GestureDetector(
                               onTap: () {
                                 print('object');
@@ -126,10 +130,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                               child: showPass
-                                  ? Icon(
-                                      Icons.visibility,
-                                    )
-                                  : Icon(Icons.visibility_off))),
+                                  ? Icon(Icons.visibility,
+                                      color: Constant.btnWidgetColor)
+                                  : Icon(Icons.visibility_off,
+                                      color: Constant.btnWidgetColor))),
                       validator: (val) {
                         if (val.isEmpty) {
                           return 'Please enter a Password';
@@ -144,13 +148,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   width: Get.width * 0.4,
                   height: Get.height * 0.05,
-                  child: ElevatedButton(
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    color: Constant.btnWidgetColor,
                     onPressed: logIn,
                     child: Text(
                       'Login',
                       style: TextStyle(
-                          fontSize: Get.width * 0.045,
-                          fontWeight: FontWeight.bold),
+                        fontSize: Get.width * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -179,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           "Sign up",
                           style: TextStyle(
                               fontSize: Get.width * 0.05,
-                              color: Colors.blue,
+                              color: Constant.iconColor,
                               fontWeight: FontWeight.bold),
                         ),
                       ),

@@ -5,7 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 class Constant {
   static const String logo = 'assets/ex_logo.png';
   static const String prof = 'assets/prof.jpg';
-  static const String appName = "Let's Exchange";
+  static const String appName = "let's Exchange";
+
+  static const Color primary = Color(0XFFE8F1FF);
+  static const Color background = Color(0XFFF6F8FF);
+  static const Color iconColor = Color(0XFF333C54);
+  static const Color btnColor = Color(0XFF0DC98D);
+  static const Color btnWidgetColor = Color(0XFF5C80B8);
+  static const Color drawerBtnColor = Color(0XFF073CAB);
   static String userId;
   static String userName;
   static String userEmail;
@@ -16,18 +23,18 @@ class Constant {
 InputDecoration inputDecoration = InputDecoration(
   border: OutlineInputBorder(
     borderRadius: BorderRadius.circular(20),
-    borderSide: BorderSide(color: Colors.blue, width: 1.0),
+    borderSide: BorderSide(color: Colors.grey, width: 1.0),
   ),
   focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(20),
       borderSide: BorderSide(
-        color: Colors.blue,
+        color: Colors.grey,
         width: 1.0,
       )),
   enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(20),
       borderSide: BorderSide(
-        color: Colors.blue,
+        color: Colors.grey,
         width: 1.0,
       )),
   // hintText: 'xyz@abc.com',
@@ -36,7 +43,7 @@ InputDecoration inputDecoration = InputDecoration(
   labelStyle: TextStyle(color: Colors.black54),
   // prefixIcon: Icon(
   //   Icons.email,
-  //   color: Colors.blue,
+  //   color: Constant.primary
   // ),
 );
 
@@ -44,11 +51,13 @@ InputDecoration inputDecoration = InputDecoration(
 BoxDecoration customDecoration = BoxDecoration(
   gradient: new LinearGradient(
     colors: [
-      const Color(0xFF00CCFF),
-      const Color(0xFF3366FF),
+      // const Color(0xFF00CCFF),
+      // const Color(0xFF3366FF),
+      Constant.primary,
+      Constant.background,
     ],
-    begin: Alignment.bottomRight,
-    end: Alignment.topLeft,
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   ),
 );
 BoxDecoration customDecoration2 = BoxDecoration(

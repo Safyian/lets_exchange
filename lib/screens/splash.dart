@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Constant.background,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -37,22 +37,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
           // *********** Let's Exchange Text **********
           Center(
-            child: Text(
-              "Let's Exchange",
-              style: GoogleFonts.permanentMarker(
-                // color: Colors.white,
-                fontSize: Get.width * 0.06,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 1.0
-                  ..color = Colors.black,
-              ),
-            ),
+            child: Text(Constant.appName,
+                style: GoogleFonts.pacifico(
+                  color: Constant.iconColor,
+                  fontSize: Get.width * 0.06,
+                  // fontWeight: FontWeight.bold,
+                )),
           ),
           SizedBox(
             height: Get.height * 0.1,
           ),
-          CircularProgressIndicator(),
+          CircularProgressIndicator(
+            backgroundColor: Constant.btnWidgetColor,
+            valueColor: AlwaysStoppedAnimation<Color>(Constant.background),
+          ),
         ],
       ),
     );

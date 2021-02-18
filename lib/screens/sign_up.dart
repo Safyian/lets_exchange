@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -112,22 +113,54 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          Constant.appName,
-          style: GoogleFonts.permanentMarker(fontSize: Get.width * 0.06),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: new BoxDecoration(
-            gradient: new LinearGradient(
-              colors: [
-                const Color(0xFF00CCFF),
-                const Color(0xFF3366FF),
+      backgroundColor: Constant.background,
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width,
+            MediaQuery.of(context).size.height / 10),
+        child: AppBar(
+          elevation: 0.0,
+          leading: Container(),
+          flexibleSpace: Container(
+            color: Constant.primary,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: 22.0, right: Get.width * 0.06),
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Constant.iconColor,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 22.0,
+                        ),
+                        child: Text(Constant.appName,
+                            style: GoogleFonts.pacifico(
+                              color: Constant.iconColor,
+                              fontSize: Get.width * 0.055,
+                              // fontWeight: FontWeight.bold,
+                            )),
+                      ),
+                      Spacer(),
+                      Spacer(),
+                    ],
+                  ),
+                ),
               ],
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
             ),
           ),
         ),
@@ -164,7 +197,7 @@ class _SignUpState extends State<SignUp> {
                       height: 120,
                       decoration: customDecoration.copyWith(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.blue)),
+                          border: Border.all(color: Colors.grey)),
                       child: _cropImage != null
                           ? ClipOval(
                               child: Image.file(_cropImage),
@@ -173,7 +206,7 @@ class _SignUpState extends State<SignUp> {
                               child: Text(
                               'Profile Picture',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.grey[600],
                                   fontWeight: FontWeight.bold),
                             )),
                     ),
@@ -193,7 +226,7 @@ class _SignUpState extends State<SignUp> {
                         labelText: 'Name',
                         prefixIcon: Icon(
                           Icons.person,
-                          color: Colors.blue,
+                          color: Constant.btnWidgetColor,
                         ),
                       ),
                       validator: (val) {
@@ -219,7 +252,7 @@ class _SignUpState extends State<SignUp> {
                           labelText: 'Email',
                           prefixIcon: Icon(
                             Icons.email,
-                            color: Colors.blue,
+                            color: Constant.btnWidgetColor,
                           )),
                       validator: (val) {
                         if (val.isEmpty) {
@@ -247,7 +280,7 @@ class _SignUpState extends State<SignUp> {
                           labelText: 'Password',
                           prefixIcon: Icon(
                             Icons.lock,
-                            color: Colors.blue,
+                            color: Constant.btnWidgetColor,
                           ),
                           suffixIcon: GestureDetector(
                               onTap: () {
@@ -259,8 +292,12 @@ class _SignUpState extends State<SignUp> {
                               child: showPass
                                   ? Icon(
                                       Icons.visibility,
+                                      color: Constant.btnWidgetColor,
                                     )
-                                  : Icon(Icons.visibility_off))),
+                                  : Icon(
+                                      Icons.visibility_off,
+                                      color: Constant.btnWidgetColor,
+                                    ))),
                       validator: (val) {
                         if (val.isEmpty) {
                           return 'Please enter a Password';
@@ -285,12 +322,17 @@ class _SignUpState extends State<SignUp> {
                 Container(
                   width: Get.width * 0.4,
                   height: Get.height * 0.05,
-                  child: ElevatedButton(
+                  child: RaisedButton(
                     onPressed: signUp,
+                    color: Constant.btnWidgetColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
                     child: Text(
                       'Sign up',
                       style: TextStyle(
                           fontSize: Get.width * 0.045,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold),
                     ),
                   ),

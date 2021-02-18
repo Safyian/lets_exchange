@@ -13,13 +13,23 @@ class CustomDrawer extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountEmail: Text(Constant.userEmail),
-              accountName: Text(Constant.userName),
+              accountEmail: Text(
+                Constant.userEmail,
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              accountName: Text(
+                Constant.userName,
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
               currentAccountPicture: GestureDetector(
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
+                    color: Constant.background,
                   ),
                   child: ClipOval(
                     child: Image.network(
@@ -41,7 +51,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                 ),
               ),
-              // decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Constant.primary),
             ),
             InkWell(
               onTap: () {
@@ -51,7 +61,7 @@ class CustomDrawer extends StatelessWidget {
                 title: Text('Home Page'),
                 leading: Icon(
                   Icons.home,
-                  color: Colors.blue,
+                  color: Constant.btnWidgetColor,
                 ),
               ),
             ),
@@ -61,21 +71,30 @@ class CustomDrawer extends StatelessWidget {
               },
               child: ListTile(
                 title: Text('Add Product'),
-                leading: Icon(Icons.add_box, color: Colors.blue),
+                leading: Icon(
+                  Icons.add_box,
+                  color: Constant.btnWidgetColor,
+                ),
               ),
             ),
             InkWell(
               onTap: () {},
               child: ListTile(
                 title: Text('My Products'),
-                leading: Icon(Icons.label_important, color: Colors.blue),
+                leading: Icon(
+                  Icons.label_important,
+                  color: Constant.btnWidgetColor,
+                ),
               ),
             ),
             InkWell(
               onTap: () {},
               child: ListTile(
                 title: Text('Chat'),
-                leading: Icon(Icons.chat, color: Colors.blue),
+                leading: Icon(
+                  Icons.chat,
+                  color: Constant.btnWidgetColor,
+                ),
               ),
             ),
             Divider(),
