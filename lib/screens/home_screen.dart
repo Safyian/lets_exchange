@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Icon(
                             FontAwesome5.bell,
                             color: Constant.iconColor,
-                            size: 28,
+                            size: 24,
                           ),
                         ),
                       ),

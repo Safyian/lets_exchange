@@ -1,10 +1,17 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+
+import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/pick_address_from_map.dart';
 import 'package:location/location.dart';
 
@@ -15,6 +22,7 @@ class AddProduct extends StatefulWidget {
 
 class _AddProductState extends State<AddProduct> {
   final _formKey = GlobalKey<FormState>();
+  var currentTime = DateTime.now();
   TextEditingController _prodName;
   TextEditingController _prodDescription;
   TextEditingController _prodPrice;
@@ -27,9 +35,15 @@ class _AddProductState extends State<AddProduct> {
     'Audio & Video',
     'Other'
   ];
-  String catagory;
-  double _value = 1.0;
-  int quantity = 1;
+  String _prodCatagory;
+  double _prodQuantity = 1;
+  double _prodLongitude;
+  double _prodLatitude;
+  File _prodCoverImg;
+  File _prodImg1;
+  File _prodImg2;
+
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -47,6 +61,7 @@ class _AddProductState extends State<AddProduct> {
 
   @override
   Widget build(BuildContext context) {
+    print('bet === $_prodLatitude');
     return Scaffold(
       backgroundColor: Constant.background,
       appBar: PreferredSize(
@@ -59,7 +74,7 @@ class _AddProductState extends State<AddProduct> {
       body: Form(
         key: _formKey,
         child: Container(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 8.0),
           height: double.infinity,
           child: SingleChildScrollView(
             child: Column(
@@ -68,29 +83,43 @@ class _AddProductState extends State<AddProduct> {
                   height: Get.height * 0.025,
                 ),
                 // ********* Add Cover Image ******
-                Container(
-                  width: Get.width * 0.4,
-                  height: Get.height * 0.18,
-                  decoration: customDecoration.copyWith(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(12.0)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image,
-                        size: 35.0,
-                        color: Constant.btnWidgetColor,
-                      ),
-                      SizedBox(
-                        height: 2.0,
-                      ),
-                      Text(
-                        'Add Cover',
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
-                      )
-                    ],
+                GestureDetector(
+                  onTap: () async {
+                    File image = await ImagePicker.pickImage(
+                        source: ImageSource.gallery, imageQuality: 100);
+                    _prodCoverImg = image;
+                    setState(() {});
+                  },
+                  child: Container(
+                    width: Get.width * 0.4,
+                    height: Get.height * 0.18,
+                    decoration: customDecoration.copyWith(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(12.0)),
+                    child: _prodCoverImg != null
+                        ? Image.file(
+                            _prodCoverImg,
+                            fit: BoxFit.contain,
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image,
+                                size: 35.0,
+                                color: Constant.btnWidgetColor,
+                              ),
+                              SizedBox(
+                                height: 2.0,
+                              ),
+                              Text(
+                                'Add Cover',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
                   ),
                 ),
 
@@ -109,15 +138,25 @@ class _AddProductState extends State<AddProduct> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // ****** 1nd Image ********
-                    Container(
-                      width: Get.width * 0.2,
-                      height: Get.height * 0.08,
-                      decoration: customDecoration2.copyWith(
-                          borderRadius: BorderRadius.circular(12.0)),
-                      child: Icon(
-                        Icons.add,
-                        // size: 35.0,
-                        color: Colors.grey[200],
+                    GestureDetector(
+                      onTap: () async {
+                        File image = await ImagePicker.pickImage(
+                            source: ImageSource.gallery, imageQuality: 100);
+                        _prodImg1 = image;
+                        setState(() {});
+                      },
+                      child: Container(
+                        width: Get.width * 0.2,
+                        height: Get.height * 0.08,
+                        decoration: customDecoration2.copyWith(
+                            borderRadius: BorderRadius.circular(12.0)),
+                        child: _prodImg1 != null
+                            ? Image.file(_prodImg1)
+                            : Icon(
+                                Icons.add,
+                                // size: 35.0,
+                                color: Colors.grey[200],
+                              ),
                       ),
                     ),
 
@@ -125,15 +164,25 @@ class _AddProductState extends State<AddProduct> {
                       width: Get.width * 0.06,
                     ),
                     // ********* 2rd Image *********
-                    Container(
-                      width: Get.width * 0.2,
-                      height: Get.height * 0.08,
-                      decoration: customDecoration2.copyWith(
-                          borderRadius: BorderRadius.circular(12.0)),
-                      child: Icon(
-                        Icons.add,
-                        // size: 35.0,
-                        color: Colors.grey[200],
+                    GestureDetector(
+                      onTap: () async {
+                        File image = await ImagePicker.pickImage(
+                            source: ImageSource.gallery, imageQuality: 100);
+                        _prodImg2 = image;
+                        setState(() {});
+                      },
+                      child: Container(
+                        width: Get.width * 0.2,
+                        height: Get.height * 0.08,
+                        decoration: customDecoration2.copyWith(
+                            borderRadius: BorderRadius.circular(12.0)),
+                        child: _prodImg2 != null
+                            ? Image.file(_prodImg2)
+                            : Icon(
+                                Icons.add,
+                                // size: 35.0,
+                                color: Colors.grey[200],
+                              ),
                       ),
                     ),
                   ],
@@ -149,18 +198,13 @@ class _AddProductState extends State<AddProduct> {
                   label: 'Product Name',
                   preIcon: Icons.label_important,
                   keyType: TextInputType.text,
+                  errorMsg: 'Please enter Product Name',
                 ),
                 // ********* Product Description **********
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     height: (Get.height / 100) * 30,
-                    // child: customInputField(
-                    //   controller: _prodDescription,
-                    //   label: 'Product Description',
-                    //   preIcon: Icons.description,
-                    //   keyType: TextInputType.text,
-                    // ),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: Colors.grey)),
@@ -179,21 +223,14 @@ class _AddProductState extends State<AddProduct> {
                               borderSide:
                                   BorderSide(color: Colors.transparent)),
                         ),
-                        // decoration: inputDecoration.copyWith(
-                        //     labelText: 'Product Description',
-                        //     prefixIcon: Icon(
-                        //       Icons.description,
-                        //       color: Constant.btnWidgetColor
-                        //     )),
                         validator: (val) {
                           if (val.isEmpty) {
-                            return 'Please enter a Password';
+                            return 'Please enter Product Description';
                           } else
                             return null;
                         },
                         keyboardType: TextInputType.text,
                         textCapitalization: TextCapitalization.sentences,
-
                         maxLines: null,
                       ),
                     ),
@@ -205,38 +242,46 @@ class _AddProductState extends State<AddProduct> {
                   label: 'Product Price',
                   preIcon: Ionicons.md_pricetag,
                   keyType: TextInputType.number,
+                  errorMsg: 'Please enter Product Price',
                 ),
                 // ******** Catagory DropDown ******
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(20, 2.5, 25, 2.5),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey, width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      // color: Colors.white,
+                  // child: Container(
+                  //   padding: EdgeInsets.fromLTRB(20, 2.5, 25, 2.5),
+                  //   decoration: BoxDecoration(
+                  //     border: Border.all(color: Colors.grey, width: 1.0),
+                  //     borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  //     // color: Colors.white,
+                  //   ),
+                  child: DropdownButtonFormField(
+                    decoration: inputDecoration.copyWith(
+                        prefixIcon: Icon(
+                      Foundation.list_thumbnails,
+                      color: Constant.btnWidgetColor,
+                    )),
+                    value: _prodCatagory,
+                    onChanged: (value) {
+                      setState(() {
+                        _prodCatagory = value;
+                      });
+                    },
+                    validator: (value) =>
+                        value == null ? 'Please select a Catagory' : null,
+                    isExpanded: true,
+                    // underline: Container(),
+                    hint: Text(
+                      'Select a Catagory',
+                      style: TextStyle(color: Colors.black54),
                     ),
-                    child: DropdownButton(
-                      value: catagory,
-                      onChanged: (value) {
-                        setState(() {
-                          catagory = value;
-                        });
-                      },
-                      isExpanded: true,
-                      underline: Container(),
-                      hint: Text(
-                        'Select a Catagory',
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                      items: catagoryList.map((religionValue) {
-                        return DropdownMenuItem(
-                          value: religionValue,
-                          child: Text(religionValue),
-                        );
-                      }).toList(),
-                    ),
+                    items: catagoryList.map((religionValue) {
+                      return DropdownMenuItem(
+                        value: religionValue,
+                        child: Text(religionValue),
+                      );
+                    }).toList(),
                   ),
+                  // ),
                 ),
 
                 // ********** Select From Map Button *********
@@ -257,17 +302,10 @@ class _AddProductState extends State<AddProduct> {
 
                       if (mounted) {
                         setState(() {
-                          // long.text = address[1].toString();
-                          // lat.text = address[0].toString();
+                          _prodLatitude = address[0];
+                          _prodLongitude = address[1];
                         });
                       }
-
-                      // if (address != null) {
-                      //   setState(() {
-                      //     businessAddress = address;
-                      //   });
-                      //   await helper.saveAddress(address);
-                      // }
                     },
                   ),
                 ),
@@ -288,10 +326,12 @@ class _AddProductState extends State<AddProduct> {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () {
-                            quantity > 1 ? quantity-- : quantity = 1;
+                            _prodQuantity > 1
+                                ? _prodQuantity--
+                                : _prodQuantity = 1;
 
                             setState(() {
-                              print(quantity);
+                              print(_prodQuantity);
                             });
                           },
                           child: quantityContainer(MaterialIcons.remove),
@@ -310,7 +350,7 @@ class _AddProductState extends State<AddProduct> {
                               border:
                                   Border.all(color: Constant.btnWidgetColor)),
                           child: Text(
-                            quantity.toString(),
+                            _prodQuantity.toString(),
                             style: TextStyle(fontSize: Get.width * 0.045),
                           ),
                         ),
@@ -320,9 +360,9 @@ class _AddProductState extends State<AddProduct> {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () {
-                            print(quantity);
-                            quantity++;
-                            print(quantity);
+                            print(_prodQuantity);
+                            _prodQuantity++;
+                            print(_prodQuantity);
                             setState(() {});
                           },
                           child: quantityContainer(
@@ -338,16 +378,16 @@ class _AddProductState extends State<AddProduct> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-                    width: Get.width * 0.8,
+                    width: Get.width * 0.7,
                     height: (Get.height / 100) * 6,
                     child: RaisedButton(
-                      onPressed: () {},
+                      onPressed: () => postProduct(),
                       color: Constant.btnWidgetColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Text(
-                        'POST AD',
+                        'POST',
                         style: TextStyle(
                             color: Colors.white, fontSize: Get.width * 0.05),
                       ),
@@ -360,6 +400,86 @@ class _AddProductState extends State<AddProduct> {
         ),
       ),
     );
+  }
+
+// **************** Post Product method **************
+  Future<void> postProduct() async {
+    String image = '';
+    UploadTask imageUploadTask;
+    if (_formKey.currentState.validate()) {
+      if (_prodCoverImg != null &&
+          _prodLatitude != null &&
+          _prodLongitude != null) {
+        try {
+          Get.defaultDialog(
+            title: 'Please wait',
+            middleText: 'Posting ...',
+          );
+          //
+          //Create a reference to the location you want to upload to in firebase
+          Reference reference = FirebaseStorage.instance
+              .ref()
+              .child('pictures')
+              .child(DateTime.now().millisecondsSinceEpoch.toString());
+
+          //Upload the file to firebase
+          imageUploadTask = reference.putFile(_prodCoverImg);
+
+          // Waits till the file is uploaded then stores the download url
+          await imageUploadTask.whenComplete(() {
+            print('image uploaded');
+          });
+          // getting image url
+          reference.getDownloadURL().then((url) async {
+            image = url.toString();
+            // ******* initialize model values *********
+            var currentTime = DateTime.now();
+            AddProductModel addProductModel = AddProductModel(
+              prodName: _prodName.text.toString(),
+              prodUid: currentTime.microsecondsSinceEpoch.toString(),
+              prodDescription: _prodDescription.text.toString(),
+              prodCatagory: _prodCatagory,
+              prodQuantity: _prodQuantity,
+              prodPrice: double.parse(_prodPrice.text.toString()),
+              latitude: _prodLatitude,
+              longitude: _prodLongitude,
+              prodCoverImg: image,
+              prodDate: currentTime.toString(),
+              prodPostBy: Constant.userId,
+            );
+            await FirebaseFirestore.instance
+                .collection('catagories')
+                .doc(addProductModel.prodCatagory)
+                .collection('products')
+                .doc(addProductModel.prodUid)
+                .set(addProductModel.toMap())
+                .then((value) {
+              _prodName.clear();
+              _prodDescription.clear();
+              _prodPrice.clear();
+              _prodCatagory = null;
+              _prodQuantity = 1;
+              _prodLongitude = null;
+              _prodLatitude = null;
+              _prodCoverImg = null;
+              setState(() {});
+              Get.back();
+              Authentication.showError(
+                  'Success', 'Your Product is Posted Successfully!');
+            });
+          });
+        } catch (e) {
+          Get.back();
+          Authentication.showError('Error', '${e.message}');
+        }
+      } else if (_prodCoverImg == null && _prodLatitude != null)
+        Authentication.showError('Empty', 'Please add a Cover Picture');
+      else if (_prodCoverImg != null && _prodLatitude == null)
+        Authentication.showError('Empty', 'Please select you Location');
+      else
+        Authentication.showError(
+            'Empty', 'Please add Cover Picture and Location');
+    }
   }
 
 // ********** AppBar *********
@@ -434,6 +554,7 @@ class _AddProductState extends State<AddProduct> {
     String label,
     IconData preIcon,
     TextInputType keyType,
+    String errorMsg,
   }) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -444,7 +565,7 @@ class _AddProductState extends State<AddProduct> {
             prefixIcon: Icon(preIcon, color: Constant.btnWidgetColor)),
         validator: (val) {
           if (val.isEmpty) {
-            return 'Please enter a Password';
+            return errorMsg;
           } else
             return null;
         },
