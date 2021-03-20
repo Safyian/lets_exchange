@@ -26,7 +26,8 @@ class _AddProductState extends State<AddProduct> {
   TextEditingController _prodName;
   TextEditingController _prodDescription;
   TextEditingController _prodPrice;
-  List<double> address = [0.0, 0.0];
+  int maxLength = 0;
+  List<double> address = [];
   List catagoryList = [
     'Kitchen Accessories',
     'Home Accessories',
@@ -62,6 +63,7 @@ class _AddProductState extends State<AddProduct> {
   @override
   Widget build(BuildContext context) {
     print('bet === $_prodLatitude');
+
     return Scaffold(
       backgroundColor: Constant.background,
       appBar: PreferredSize(
@@ -123,71 +125,6 @@ class _AddProductState extends State<AddProduct> {
                   ),
                 ),
 
-                // ***** Add More Image ******
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 18.0, 8.0, 8.0),
-                  child: Text(
-                    'Add more Pictures(optional)',
-                    style: TextStyle(
-                        // fontSize: 16.0,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // ****** 1nd Image ********
-                    GestureDetector(
-                      onTap: () async {
-                        File image = await ImagePicker.pickImage(
-                            source: ImageSource.gallery, imageQuality: 100);
-                        _prodImg1 = image;
-                        setState(() {});
-                      },
-                      child: Container(
-                        width: Get.width * 0.2,
-                        height: Get.height * 0.08,
-                        decoration: customDecoration2.copyWith(
-                            borderRadius: BorderRadius.circular(12.0)),
-                        child: _prodImg1 != null
-                            ? Image.file(_prodImg1)
-                            : Icon(
-                                Icons.add,
-                                // size: 35.0,
-                                color: Colors.grey[200],
-                              ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      width: Get.width * 0.06,
-                    ),
-                    // ********* 2rd Image *********
-                    GestureDetector(
-                      onTap: () async {
-                        File image = await ImagePicker.pickImage(
-                            source: ImageSource.gallery, imageQuality: 100);
-                        _prodImg2 = image;
-                        setState(() {});
-                      },
-                      child: Container(
-                        width: Get.width * 0.2,
-                        height: Get.height * 0.08,
-                        decoration: customDecoration2.copyWith(
-                            borderRadius: BorderRadius.circular(12.0)),
-                        child: _prodImg2 != null
-                            ? Image.file(_prodImg2)
-                            : Icon(
-                                Icons.add,
-                                // size: 35.0,
-                                color: Colors.grey[200],
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
-
                 // ********* Text Input Fields **********
                 SizedBox(
                   height: Get.height * 0.012,
@@ -222,10 +159,19 @@ class _AddProductState extends State<AddProduct> {
                           enabledBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.transparent)),
+                          counterText:
+                              maxLength <= 100 ? "$maxLength/100" : null,
+                          counterStyle: TextStyle(color: Colors.red),
                         ),
+                        onChanged: (value) {
+                          maxLength = value.length;
+                          setState(() {});
+                        },
                         validator: (val) {
                           if (val.isEmpty) {
                             return 'Please enter Product Description';
+                          } else if (val.length < 100) {
+                            return 'Description must contains atleast 100 words';
                           } else
                             return null;
                         },
@@ -247,13 +193,7 @@ class _AddProductState extends State<AddProduct> {
                 // ******** Catagory DropDown ******
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  // child: Container(
-                  //   padding: EdgeInsets.fromLTRB(20, 2.5, 25, 2.5),
-                  //   decoration: BoxDecoration(
-                  //     border: Border.all(color: Colors.grey, width: 1.0),
-                  //     borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  //     // color: Colors.white,
-                  //   ),
+
                   child: DropdownButtonFormField(
                     decoration: inputDecoration.copyWith(
                         prefixIcon: Icon(
@@ -295,16 +235,16 @@ class _AddProductState extends State<AddProduct> {
                         address = await Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (_) => PickAddressFromMap()));
+
+                        if (mounted) {
+                          setState(() {
+                            _prodLatitude = address[0];
+                            _prodLongitude = address[1];
+                          });
+                        }
                       } else {
                         Authentication.showError(
                             'Error', 'Please turn on location');
-                      }
-
-                      if (mounted) {
-                        setState(() {
-                          _prodLatitude = address[0];
-                          _prodLongitude = address[1];
-                        });
                       }
                     },
                   ),
@@ -437,6 +377,7 @@ class _AddProductState extends State<AddProduct> {
             AddProductModel addProductModel = AddProductModel(
               prodName: _prodName.text.toString(),
               prodUid: currentTime.microsecondsSinceEpoch.toString(),
+              prodStatus: 'pending',
               prodDescription: _prodDescription.text.toString(),
               prodCatagory: _prodCatagory,
               prodQuantity: _prodQuantity,
@@ -448,9 +389,7 @@ class _AddProductState extends State<AddProduct> {
               prodPostBy: Constant.userId,
             );
             await FirebaseFirestore.instance
-                .collection('catagories')
-                .doc(addProductModel.prodCatagory)
-                .collection('products')
+                .collection(addProductModel.prodCatagory)
                 .doc(addProductModel.prodUid)
                 .set(addProductModel.toMap())
                 .then((value) {

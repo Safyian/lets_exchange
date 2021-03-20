@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AddProductModel {
   String prodName;
   String prodUid;
+  String prodStatus;
   String prodDescription;
   double prodPrice;
   String prodCatagory;
@@ -16,6 +17,7 @@ class AddProductModel {
   AddProductModel({
     @required this.prodName,
     @required this.prodUid,
+    @required this.prodStatus,
     @required this.prodDescription,
     @required this.prodPrice,
     @required this.prodCatagory,
@@ -31,6 +33,7 @@ class AddProductModel {
     return {
       'prodName': prodName,
       'prodUid': prodUid,
+      'prodStatus': prodStatus,
       'prodDescription': prodDescription,
       'prodPrice': prodPrice,
       'prodCatagory': prodCatagory,
@@ -49,6 +52,7 @@ class AddProductModel {
     return AddProductModel(
       prodName: map['prodName'],
       prodUid: map['prodUid'],
+      prodStatus: map['prodStatus'],
       prodDescription: map['prodDescription'],
       prodPrice: map['prodPrice'],
       prodCatagory: map['prodCatagory'],

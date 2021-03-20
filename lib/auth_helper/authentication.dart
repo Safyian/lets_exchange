@@ -124,7 +124,8 @@ class Authentication {
         showError('Error', 'Password is Incorrect. Please try again.');
       } else if (e.code == 'invalid-email') {
         showError('Error', 'Please enter a valid Email.');
-      }
+      } else
+        showError('Error', e.toString());
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/const/const.dart';
@@ -44,18 +45,20 @@ class _SplashScreenState extends State<SplashScreen> {
                   // fontWeight: FontWeight.bold,
                 )),
           ),
+
           SizedBox(
-            height: Get.height * 0.1,
+            height: Get.height * 0.06,
           ),
-          CircularProgressIndicator(
-            backgroundColor: Constant.btnWidgetColor,
-            valueColor: AlwaysStoppedAnimation<Color>(Constant.background),
+          SpinKitFadingCircle(
+            color: Constant.btnWidgetColor,
+            size: Get.width * 0.12,
           ),
         ],
       ),
     );
   }
 
+  // ********* Check User State Token ********
   checkUser() async {
     var user = FirebaseAuth.instance.currentUser;
     if (user != null) {
