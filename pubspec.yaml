@@ -26,6 +26,7 @@ dependencies:
   flutter_money_formatter:
     git:
       url: git://github.com/anisalibegic/flutter_money_formatter.git
+  carousel_slider: ^3.0.0
   cloud_firestore: ^0.16.0
   cupertino_icons: ^1.0.0
   email_validator: ^1.0.6
@@ -33,7 +34,7 @@ dependencies:
   firebase_core: ^0.7.0
   firebase_storage: ^7.0.0
   flutter_icons: ^1.1.0
-  flutter_rating_bar:
+  flutter_rating_bar: null
   flutter_spinkit: null
   flutter_staggered_grid_view: ^0.3.4
   geolocator: ^5.3.2+2
@@ -43,6 +44,7 @@ dependencies:
   image_cropper: ^1.3.1
   image_picker: ^0.6.7+22
   location: ^3.0.0
+  multi_image_picker: null
   search_map_place: ^0.3.0
 
 dev_dependencies:

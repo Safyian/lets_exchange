@@ -202,6 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: Get.height * 0.01,
               ),
+
+              // ********** GridView Starts here ********
               StaggeredGridView.countBuilder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -211,90 +213,99 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: _pList.length,
                 itemBuilder: (context, index) {
                   // ********* Card ********
-                  return Card(
-                    elevation: 2.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // ************ Product Image ********
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12))),
-                          child: Stack(
-                            children: [
-                              SpinKitPulse(
-                                color: Constant.btnWidgetColor,
-                                size: 65,
-                              ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(12),
-                                    topRight: Radius.circular(12)),
-                                child: Image.network(_pList[index].prodCoverImg,
-                                    fit: BoxFit.cover),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.01,
-                        ),
-
-                        // ********* Product Name Text ********
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            _pList[index].prodName,
-                            style: GoogleFonts.roboto(
-                                color: Colors.black,
-                                fontSize: Get.width * 0.035),
-                          ),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.01,
-                        ),
-                        // ********* Product Price Text ********
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            '${formateMoney(_pList[index].prodPrice)}',
-                            style: GoogleFonts.roboto(
-                                color: Colors.orange[800],
-                                fontWeight: FontWeight.bold,
-                                fontSize: Get.width * 0.035),
-                          ),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.01,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: RatingBar.builder(
-                            initialRating: 3.5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 5,
-                            itemPadding: EdgeInsets.symmetric(horizontal: 0.5),
-                            itemSize: Get.width * 0.04,
-                            itemBuilder: (context, _) => Icon(
-                              Icons.star,
-                              color: Colors.amber,
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(ProductDetailsScreen(
+                        productDetail: _pList[index],
+                      ));
+                    },
+                    child: Card(
+                      elevation: 2.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ************ Product Image ********
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(12))),
+                            child: Stack(
+                              children: [
+                                SpinKitPulse(
+                                  color: Constant.btnWidgetColor,
+                                  size: 65,
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(12),
+                                      topRight: Radius.circular(12)),
+                                  child: Image.network(
+                                      _pList[index].prodCoverImg,
+                                      fit: BoxFit.cover),
+                                ),
+                              ],
                             ),
-                            onRatingUpdate: (rating) {
-                              print(rating);
-                            },
                           ),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.01,
-                        ),
-                      ],
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
+
+                          // ********* Product Name Text ********
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              _pList[index].prodName,
+                              style: GoogleFonts.roboto(
+                                  color: Colors.black,
+                                  fontSize: Get.width * 0.035),
+                            ),
+                          ),
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
+                          // ********* Product Price Text ********
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '${formateMoney(_pList[index].prodPrice)}',
+                              style: GoogleFonts.roboto(
+                                  color: Colors.orange[800],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: Get.width * 0.035),
+                            ),
+                          ),
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: RatingBar.builder(
+                              initialRating: 3.5,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 5,
+                              itemPadding:
+                                  EdgeInsets.symmetric(horizontal: 0.5),
+                              itemSize: Get.width * 0.04,
+                              itemBuilder: (context, _) => Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                              onRatingUpdate: (rating) {
+                                print(rating);
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },

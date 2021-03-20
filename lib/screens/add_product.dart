@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/pick_address_from_map.dart';
 import 'package:location/location.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
 class AddProduct extends StatefulWidget {
   @override
@@ -41,8 +43,10 @@ class _AddProductState extends State<AddProduct> {
   double _prodLongitude;
   double _prodLatitude;
   File _prodCoverImg;
-  File _prodImg1;
-  File _prodImg2;
+  List<Asset> images = <Asset>[];
+  int _current = 0;
+  List<String> imageUrls = <String>[];
+  String _error = 'No Error Dectected';
 
   final picker = ImagePicker();
 
@@ -63,6 +67,7 @@ class _AddProductState extends State<AddProduct> {
   @override
   Widget build(BuildContext context) {
     print('bet === $_prodLatitude');
+    print('bet === $images');
 
     return Scaffold(
       backgroundColor: Constant.background,
@@ -84,26 +89,85 @@ class _AddProductState extends State<AddProduct> {
                 SizedBox(
                   height: Get.height * 0.025,
                 ),
-                // ********* Add Cover Image ******
-                GestureDetector(
-                  onTap: () async {
-                    File image = await ImagePicker.pickImage(
-                        source: ImageSource.gallery, imageQuality: 100);
-                    _prodCoverImg = image;
-                    setState(() {});
-                  },
-                  child: Container(
-                    width: Get.width * 0.4,
-                    height: Get.height * 0.18,
-                    decoration: customDecoration.copyWith(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(12.0)),
-                    child: _prodCoverImg != null
-                        ? Image.file(
-                            _prodCoverImg,
-                            fit: BoxFit.contain,
-                          )
-                        : Column(
+                // ********* Add Images ******
+
+                (images.isNotEmpty)
+                    ? Column(
+                        children: [
+                          CarouselSlider(
+                            items: images
+                                .map((item) => Container(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0)),
+                                        child: Stack(
+                                          children: <Widget>[
+                                            AssetThumb(
+                                              asset: item,
+                                              quality: 100,
+                                              width: 2000,
+                                              height: 2000,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                            options: CarouselOptions(
+                                autoPlay: false,
+                                enlargeCenterPage: true,
+                                enableInfiniteScroll: false,
+                                // height: 200.0,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _current = index;
+                                  });
+                                }),
+
+                            // end ///
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: images.map((url) {
+                              int index = images.indexOf(url);
+                              return Container(
+                                width: 8.0,
+                                height: 8.0,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 2.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _current == index
+                                      ? Color.fromRGBO(0, 0, 0, 0.9)
+                                      : Color.fromRGBO(0, 0, 0, 0.4),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      )
+                    : GestureDetector(
+                        onTap: () async {
+                          // File image = await ImagePicker.pickImage(
+                          //     source: ImageSource.gallery, imageQuality: 100);
+                          // _prodCoverImg = image;
+                          // setState(() {});
+                          loadAssets();
+                        },
+                        child: Container(
+                          width: Get.width * 0.4,
+                          height: Get.height * 0.18,
+                          decoration: customDecoration.copyWith(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(12.0)),
+                          child:
+                              // _prodCoverImg != null
+                              // ? Image.file(
+                              //     _prodCoverImg,
+                              //     fit: BoxFit.contain,
+                              //   )
+
+                              Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
@@ -115,15 +179,15 @@ class _AddProductState extends State<AddProduct> {
                                 height: 2.0,
                               ),
                               Text(
-                                'Add Cover',
+                                'Add Images',
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold),
                               )
                             ],
                           ),
-                  ),
-                ),
+                        ),
+                      ),
 
                 // ********* Text Input Fields **********
                 SizedBox(
@@ -512,6 +576,41 @@ class _AddProductState extends State<AddProduct> {
         textCapitalization: TextCapitalization.sentences,
       ),
     );
+  }
+
+  // ********* Multi Image Picker ********
+  Future<void> loadAssets() async {
+    List<Asset> resultList = <Asset>[];
+    String error = 'No Error Detected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 5,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      // _error = error;
+      print('image = $images');
+    });
   }
 }
 
