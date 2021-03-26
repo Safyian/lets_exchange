@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lets_exchange/auth_helper/services.dart';
 
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       topLeft: Radius.circular(12),
                                       topRight: Radius.circular(12)),
                                   child: Image.network(
-                                      _pList[index].prodCoverImg,
+                                      _pList[index].prodImages[0],
                                       fit: BoxFit.cover),
                                 ),
                               ],
@@ -271,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              '${formateMoney(_pList[index].prodPrice)}',
+                              '${Services().formateMoney(_pList[index].prodPrice)}',
                               style: GoogleFonts.roboto(
                                   color: Colors.orange[800],
                                   fontWeight: FontWeight.bold,
@@ -348,17 +348,5 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {});
       }
     });
-  }
-
-  // ******** Money Formattor *********
-  formateMoney(double amount) {
-    FlutterMoneyFormatter fmf = new FlutterMoneyFormatter(
-      amount: amount,
-      settings: MoneyFormatterSettings(
-        symbol: 'Rs.',
-        fractionDigits: 0,
-      ),
-    );
-    return fmf.output.symbolOnLeft;
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -5,10 +6,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lets_exchange/auth_helper/authentication.dart';
+import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
@@ -39,7 +42,7 @@ class _AddProductState extends State<AddProduct> {
     'Other'
   ];
   String _prodCatagory;
-  double _prodQuantity = 1;
+  int _prodQuantity = 1;
   double _prodLongitude;
   double _prodLatitude;
   File _prodCoverImg;
@@ -90,7 +93,6 @@ class _AddProductState extends State<AddProduct> {
                   height: Get.height * 0.025,
                 ),
                 // ********* Add Images ******
-
                 (images.isNotEmpty)
                     ? Column(
                         children: [
@@ -223,8 +225,7 @@ class _AddProductState extends State<AddProduct> {
                           enabledBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.transparent)),
-                          counterText:
-                              maxLength <= 100 ? "$maxLength/100" : null,
+                          counterText: maxLength < 30 ? "$maxLength/30" : null,
                           counterStyle: TextStyle(color: Colors.red),
                         ),
                         onChanged: (value) {
@@ -234,8 +235,8 @@ class _AddProductState extends State<AddProduct> {
                         validator: (val) {
                           if (val.isEmpty) {
                             return 'Please enter Product Description';
-                          } else if (val.length < 100) {
-                            return 'Description must contains atleast 100 words';
+                          } else if (val.length < 30) {
+                            return 'Description must contains atleast 30 words';
                           } else
                             return null;
                         },
@@ -314,7 +315,7 @@ class _AddProductState extends State<AddProduct> {
                   ),
                 ),
 
-                // ********* Quantity Slider ********
+                // ********* Quantity ********
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Row(
@@ -411,77 +412,90 @@ class _AddProductState extends State<AddProduct> {
     String image = '';
     UploadTask imageUploadTask;
     if (_formKey.currentState.validate()) {
-      if (_prodCoverImg != null &&
-          _prodLatitude != null &&
-          _prodLongitude != null) {
+      if (images != null && _prodLatitude != null && _prodLongitude != null) {
         try {
           Get.defaultDialog(
             title: 'Please wait',
-            middleText: 'Posting ...',
+            middleText: 'Posting your Product...',
+            actions: [
+              SpinKitFadingCircle(
+                color: Constant.btnWidgetColor,
+                size: Get.width * 0.12,
+              ),
+            ],
           );
           //
-          //Create a reference to the location you want to upload to in firebase
-          Reference reference = FirebaseStorage.instance
-              .ref()
-              .child('pictures')
-              .child(DateTime.now().millisecondsSinceEpoch.toString());
+          // //Create a reference to the location you want to upload to in firebase
+          // Reference reference = FirebaseStorage.instance
+          //     .ref()
+          //     .child('pictures')
+          //     .child(DateTime.now().millisecondsSinceEpoch.toString());
 
-          //Upload the file to firebase
-          imageUploadTask = reference.putFile(_prodCoverImg);
+          // //Upload the file to firebase
+          // imageUploadTask = reference.putFile(_prodCoverImg);
 
-          // Waits till the file is uploaded then stores the download url
-          await imageUploadTask.whenComplete(() {
-            print('image uploaded');
-          });
-          // getting image url
-          reference.getDownloadURL().then((url) async {
-            image = url.toString();
-            // ******* initialize model values *********
-            var currentTime = DateTime.now();
-            AddProductModel addProductModel = AddProductModel(
-              prodName: _prodName.text.toString(),
-              prodUid: currentTime.microsecondsSinceEpoch.toString(),
-              prodStatus: 'pending',
-              prodDescription: _prodDescription.text.toString(),
-              prodCatagory: _prodCatagory,
-              prodQuantity: _prodQuantity,
-              prodPrice: double.parse(_prodPrice.text.toString()),
-              latitude: _prodLatitude,
-              longitude: _prodLongitude,
-              prodCoverImg: image,
-              prodDate: currentTime.toString(),
-              prodPostBy: Constant.userId,
-            );
-            await FirebaseFirestore.instance
-                .collection(addProductModel.prodCatagory)
-                .doc(addProductModel.prodUid)
-                .set(addProductModel.toMap())
-                .then((value) {
-              _prodName.clear();
-              _prodDescription.clear();
-              _prodPrice.clear();
-              _prodCatagory = null;
-              _prodQuantity = 1;
-              _prodLongitude = null;
-              _prodLatitude = null;
-              _prodCoverImg = null;
-              setState(() {});
-              Get.back();
-              Authentication.showError(
-                  'Success', 'Your Product is Posted Successfully!');
+          // // Waits till the file is uploaded then stores the download url
+          // await imageUploadTask.whenComplete(() {
+          //   print('image uploaded');
+          // });
+          // // getting image url
+          // reference.getDownloadURL().then((url) async {
+          //   image = url.toString();
+
+          for (var imageFile in images) {
+            await Services().postImage(imageFile).then((downloadUrl) {
+              imageUrls.add(downloadUrl.toString());
             });
+
+            setState(() {});
+          }
+          print('Images are here = $imageUrls');
+          // ******* initialize model values *********
+          var currentTime = DateTime.now();
+          AddProductModel addProductModel = AddProductModel(
+            prodName: _prodName.text.toString(),
+            sellerName: Constant.userName,
+            prodUid: currentTime.microsecondsSinceEpoch.toString(),
+            prodStatus: 'pending',
+            prodDescription: _prodDescription.text.toString(),
+            prodCatagory: _prodCatagory,
+            prodQuantity: _prodQuantity,
+            prodPrice: double.parse(_prodPrice.text.toString()),
+            latitude: _prodLatitude,
+            longitude: _prodLongitude,
+            prodImages: imageUrls,
+            prodDate: currentTime.toString(),
+            prodPostBy: Constant.userId,
+          );
+          await FirebaseFirestore.instance
+              .collection(addProductModel.prodCatagory)
+              .doc(addProductModel.prodUid)
+              .set(addProductModel.toMap())
+              .then((value) {
+            _prodName.clear();
+            _prodDescription.clear();
+            _prodPrice.clear();
+            _prodCatagory = null;
+            _prodQuantity = 1;
+            _prodLongitude = null;
+            _prodLatitude = null;
+            _prodCoverImg = null;
+            setState(() {});
+            Get.back();
+            Authentication.showError(
+                'Success', 'Your Product is Posted Successfully!');
+            // });
           });
         } catch (e) {
           Get.back();
           Authentication.showError('Error', '${e.message}');
         }
       } else if (_prodCoverImg == null && _prodLatitude != null)
-        Authentication.showError('Empty', 'Please add a Cover Picture');
+        Authentication.showError('Empty', 'Please add a Picture');
       else if (_prodCoverImg != null && _prodLatitude == null)
         Authentication.showError('Empty', 'Please select you Location');
       else
-        Authentication.showError(
-            'Empty', 'Please add Cover Picture and Location');
+        Authentication.showError('Empty', 'Please add Picture and Location');
     }
   }
 
