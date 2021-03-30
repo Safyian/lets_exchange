@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class Constant {
   static const String logo = 'assets/ex_logo.png';
@@ -12,6 +10,7 @@ class Constant {
   static const Color iconColor = Color(0XFF333C54);
   static const Color btnColor = Color(0XFF0DC98D);
   static const Color btnWidgetColor = Color(0XFF5C80B8);
+  static const Color navColor = Color(0XFFCFE1FF);
   static const Color drawerBtnColor = Color(0XFF073CAB);
   static String userId;
   static String userName;

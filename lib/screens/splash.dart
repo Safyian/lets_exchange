@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/screens/home_screen.dart';
 import 'package:lets_exchange/screens/login.dart';
+import 'package:lets_exchange/widgets/bottom_navBar.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -74,7 +75,8 @@ class _SplashScreenState extends State<SplashScreen> {
         Constant.userName = value.data()['name'];
         Constant.userImage = value.data()['image'];
       });
-      Get.off(HomeScreen());
+      // Get.off(HomeScreen());
+      Get.off(BottomNavBar());
     } else
       Get.off(LoginScreen());
   }

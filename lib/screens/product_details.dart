@@ -225,7 +225,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ),
                           Text(
-                            address,
+                            address ?? '',
                             style: GoogleFonts.roboto(
                               fontSize: Get.width * 0.038,
                               color: Colors.grey[600],
@@ -252,7 +252,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           SizedBox(
                             height: Get.height * 0.01,
                           ),
-                          // ********* Prod Posted Date ******
+                          // ********* Prod Seller Name ******
                           Text(
                             'Seller Name:',
                             style: GoogleFonts.roboto(

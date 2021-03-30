@@ -1,6 +1,4 @@
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -479,7 +477,7 @@ class _AddProductState extends State<AddProduct> {
             _prodQuantity = 1;
             _prodLongitude = null;
             _prodLatitude = null;
-            _prodCoverImg = null;
+            images.clear();
             setState(() {});
             Get.back();
             Authentication.showError(
@@ -490,9 +488,9 @@ class _AddProductState extends State<AddProduct> {
           Get.back();
           Authentication.showError('Error', '${e.message}');
         }
-      } else if (_prodCoverImg == null && _prodLatitude != null)
+      } else if (images == null && _prodLatitude != null)
         Authentication.showError('Empty', 'Please add a Picture');
-      else if (_prodCoverImg != null && _prodLatitude == null)
+      else if (images != null && _prodLatitude == null)
         Authentication.showError('Empty', 'Please select you Location');
       else
         Authentication.showError('Empty', 'Please add Picture and Location');
