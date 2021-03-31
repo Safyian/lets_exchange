@@ -1,15 +1,12 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lets_exchange/const/const.dart';
-
-import 'package:lets_exchange/screens/home_screen.dart';
 import 'package:lets_exchange/screens/login.dart';
+import 'package:lets_exchange/widgets/bottom_navBar.dart';
 
 class Authentication {
   static FirebaseAuth _auth = FirebaseAuth.instance;
@@ -67,7 +64,7 @@ class Authentication {
             Get.back();
             showError('Success', 'Account created Successfully!');
             Future.delayed(Duration(seconds: 2))
-                .then((value) => Get.offAll(HomeScreen()));
+                .then((value) => Get.offAll(BottomNavBar()));
           }
         });
       }
@@ -113,7 +110,7 @@ class Authentication {
         });
         //
         Get.back();
-        Get.offAll(HomeScreen());
+        Get.offAll(BottomNavBar());
       }
     } catch (e) {
       print('print == ${e.code}');
