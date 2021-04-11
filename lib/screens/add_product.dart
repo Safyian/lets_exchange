@@ -464,6 +464,7 @@ class _AddProductState extends State<AddProduct> {
             prodImages: imageUrls,
             prodDate: currentTime.toString(),
             prodPostBy: Constant.userId,
+            favouriteBy: [],
           );
           await FirebaseFirestore.instance
               .collection(addProductModel.prodCatagory)

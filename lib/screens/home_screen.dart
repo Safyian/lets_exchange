@@ -20,6 +20,7 @@ import 'package:lets_exchange/screens/home_product.dart';
 import 'package:lets_exchange/screens/kitchen_products.dart';
 import 'package:lets_exchange/screens/product_details.dart';
 import 'package:lets_exchange/widgets/drawer.dart';
+import 'package:lets_exchange/widgets/product_card.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   List<AddProductModel> _pList = List<AddProductModel>();
+  List id = [];
   List<AddProductModel> _computerMobList = List<AddProductModel>();
   List<AddProductModel> _kitchenList = List<AddProductModel>();
   List<AddProductModel> _homeList = List<AddProductModel>();
@@ -54,8 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('object = ${_pList.length}');
     _pList.sort(
         (a, b) => a.prodName.toLowerCase().compareTo(b.prodName.toLowerCase()));
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: CustomDrawer(),
@@ -321,101 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: _pList.length,
                 itemBuilder: (context, index) {
                   // ********* Card ********
-                  return GestureDetector(
-                    onTap: () {
-                      Get.to(ProductDetailsScreen(
-                        productDetail: _pList[index],
-                      ));
-                    },
-                    child: Card(
-                      elevation: 2.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // ************ Product Image ********
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12))),
-                            child: Stack(
-                              children: [
-                                SpinKitPulse(
-                                  color: Constant.btnWidgetColor,
-                                  size: 65,
-                                ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(12),
-                                      topRight: Radius.circular(12)),
-                                  child: Image.network(
-                                      _pList[index].prodImages[0],
-                                      fit: BoxFit.cover),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.01,
-                          ),
-
-                          // ********* Product Name Text ********
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              _pList[index].prodName,
-                              style: GoogleFonts.roboto(
-                                  color: Colors.black,
-                                  fontSize: Get.width * 0.035),
-                            ),
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.01,
-                          ),
-                          // ********* Product Price Text ********
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              '${Services().formateMoney(_pList[index].prodPrice)}',
-                              style: GoogleFonts.roboto(
-                                  color: Colors.orange[800],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Get.width * 0.035),
-                            ),
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.01,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: RatingBar.builder(
-                              initialRating: 3.5,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemPadding:
-                                  EdgeInsets.symmetric(horizontal: 0.5),
-                              itemSize: Get.width * 0.04,
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              onRatingUpdate: (rating) {
-                                print(rating);
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.01,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return ProductCard(prodList: _pList[index]);
                 },
                 staggeredTileBuilder: (_) => StaggeredTile.fit(2),
               ),
@@ -426,21 +336,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-// ******** Getting User Info *******
-  getUserInfo() async {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(Constant.userId)
-        .get()
-        .then((value) {
-      print('value = ${value.data()['image']}');
-
-      Constant.userEmail = value.data()['email'];
-      Constant.userName = value.data()['name'];
-      Constant.userImage = value.data()['image'];
-    });
-  }
-
   // ********** Getting Products ********
   Future<void> getProducts() async {
     _pList.clear();
@@ -448,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Computers & Mobiles')
         .snapshots()
-        .listen((value) {
+        .listen((value) async {
       if (value.docs != null) {
         _computerMobList.clear();
         value.docs.forEach((element) {
@@ -471,6 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _kitchenList.add(AddProductModel.fromMap(element.data()));
         });
         _pList.addAll(_kitchenList);
+
         setState(() {});
       }
     });
@@ -486,6 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _gameList.add(AddProductModel.fromMap(element.data()));
         });
         _pList.addAll(_gameList);
+
         setState(() {});
       }
       print('Bet = $_gameList');
@@ -502,6 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _homeList.add(AddProductModel.fromMap(element.data()));
         });
         _pList.addAll(_homeList);
+
         setState(() {});
       }
     });
@@ -518,6 +416,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _avList.add(AddProductModel.fromMap(element.data()));
         });
         _pList.addAll(_avList);
+
         setState(() {});
       }
       print('set = $_avList');
@@ -534,6 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _otherList.add(AddProductModel.fromMap(element.data()));
         });
         _pList.addAll(_otherList);
+
         setState(() {});
       }
     });
