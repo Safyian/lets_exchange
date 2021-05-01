@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/screens/add_product.dart';
+import 'package:lets_exchange/screens/my_products.dart';
 
 class CustomDrawer extends StatelessWidget {
   @override
@@ -78,7 +79,9 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Get.to(MyProducts());
+              },
               child: ListTile(
                 title: Text('My Products'),
                 leading: Icon(

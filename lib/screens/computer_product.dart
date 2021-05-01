@@ -8,10 +8,11 @@ import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/product_details.dart';
+import 'package:lets_exchange/widgets/catagory_productCard.dart';
 import 'package:lets_exchange/widgets/product_card.dart';
 
 class ComputerMobileProduct extends StatefulWidget {
-  final List<AddProductModel> product;
+  final List<ProductModel> product;
   ComputerMobileProduct({this.product});
   @override
   _ComputerMobileProductState createState() => _ComputerMobileProductState();
@@ -81,7 +82,7 @@ class _ComputerMobileProductState extends State<ComputerMobileProduct> {
                 itemCount: widget.product.length,
                 itemBuilder: (context, index) {
                   // ********* Card ********
-                  return ProductCard(prodList: widget.product[index]);
+                  return CatagoryProductCard(prodList: widget.product[index]);
                 },
                 staggeredTileBuilder: (_) => StaggeredTile.fit(2),
               ),

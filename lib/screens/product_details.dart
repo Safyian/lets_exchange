@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geocoder/geocoder.dart';
@@ -12,7 +13,7 @@ import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final AddProductModel productDetail;
+  final ProductModel productDetail;
   ProductDetailsScreen({@required this.productDetail});
   @override
   _ProductDetailsScreenState createState() => _ProductDetailsScreenState();
@@ -20,7 +21,7 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _current = 0;
-  bool favIcon = false;
+  bool favIcon;
   String address;
   String date;
   String duration;
@@ -30,6 +31,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     locationFromCordinates(Coordinates(
         widget.productDetail.latitude, widget.productDetail.longitude));
     prodDate();
+    favIcon = widget.productDetail.favouriteBy.contains(Constant.userId)
+        ? true
+        : false;
     super.initState();
   }
 
@@ -51,22 +55,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             size: 28,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                favIcon = !favIcon;
-                setState(() {});
-              },
-              child: Icon(
-                favIcon ? Icons.favorite : Icons.favorite_border,
-                color: favIcon ? Colors.red : Constant.iconColor,
-                size: 30,
-              ),
-            ),
+        title: Container(
+          width: Get.width * 0.8,
+          child: Text(
+            widget.productDetail.prodName,
+            style: TextStyle(
+                color: Constant.iconColor, fontSize: Get.width * 0.045),
+            overflow: TextOverflow.ellipsis,
           ),
-        ],
+        ),
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.all(8.0),
+        //     child: GestureDetector(
+        //       onTap: () {
+        //         setState(() {
+        //           favIcon = !favIcon;
+        //         });
+        //         addtoFavourite(uid: widget.productDetail.prodUid);
+        //       },
+        //       child: Icon(
+        //         favIcon ? Icons.favorite : Icons.favorite_border,
+        //         color: favIcon ? Colors.red : Constant.iconColor,
+        //         size: 30,
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ),
 
       // ********* Chat Floating Button *******

@@ -83,7 +83,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         index: selectedIdx,
         children: [
           HomeScreen(),
-          // FavouriteScreen(),
+          FavouriteScreen(),
         ],
       ),
     );

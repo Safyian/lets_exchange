@@ -30,14 +30,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  List<AddProductModel> _pList = List<AddProductModel>();
+  List<ProductModel> _pList = [];
   List id = [];
-  List<AddProductModel> _computerMobList = List<AddProductModel>();
-  List<AddProductModel> _kitchenList = List<AddProductModel>();
-  List<AddProductModel> _homeList = List<AddProductModel>();
-  List<AddProductModel> _gameList = List<AddProductModel>();
-  List<AddProductModel> _avList = List<AddProductModel>();
-  List<AddProductModel> _otherList = List<AddProductModel>();
+  List<ProductModel> _computerMobList = [];
+  List<ProductModel> _kitchenList = [];
+  List<ProductModel> _homeList = [];
+  List<ProductModel> _gameList = [];
+  List<ProductModel> _avList = [];
+  List<ProductModel> _otherList = [];
   bool search = false;
   List<CatagoryModel> catagoryList = [
     CatagoryModel(catagory: 'Kitchen', image: 'assets/kitchen.png'),
@@ -338,84 +338,97 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ********** Getting Products ********
   Future<void> getProducts() async {
-    _pList.clear();
-    // ******** Computer & Mob List getting*******
+    // ******** All Products *******
     await FirebaseFirestore.instance
-        .collection('Computers & Mobiles')
+        .collection('Products')
         .snapshots()
         .listen((value) async {
+      if (value.docs != null) {
+        _pList.clear();
+        value.docs.forEach((element) {
+          _pList.add(ProductModel.fromMap(element.data()));
+        });
+        setState(() {});
+      }
+    });
+    // ******** Computer & Mob List getting*******
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .where('prodCatagory', isEqualTo: 'Computers & Mobiles')
+        .snapshots()
+        .listen((value) {
       if (value.docs != null) {
         _computerMobList.clear();
         value.docs.forEach((element) {
           print('id = ${element.id}');
-          _computerMobList.add(AddProductModel.fromMap(element.data()));
+          _computerMobList.add(ProductModel.fromMap(element.data()));
         });
-        _pList.addAll(_computerMobList);
-        setState(() {});
-      }
-    });
-    // ******** Kitchen Acc List *******
-    await FirebaseFirestore.instance
-        .collection('Kitchen Accessories')
-        .snapshots()
-        .listen((value) {
-      if (value.docs != null) {
-        _kitchenList.clear();
-        value.docs.forEach((element) {
-          print('id = ${element.id}');
-          _kitchenList.add(AddProductModel.fromMap(element.data()));
-        });
-        _pList.addAll(_kitchenList);
 
         setState(() {});
       }
     });
     // ******** Game List *******
     await FirebaseFirestore.instance
-        .collection('Games')
+        .collection('Products')
+        .where('prodCatagory', isEqualTo: 'Games')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
         _gameList.clear();
         value.docs.forEach((element) {
           print('id = ${element.id}');
-          _gameList.add(AddProductModel.fromMap(element.data()));
+          _gameList.add(ProductModel.fromMap(element.data()));
+          setState(() {});
         });
-        _pList.addAll(_gameList);
 
         setState(() {});
       }
-      print('Bet = $_gameList');
     });
     // ******** Home Acc List *******
     await FirebaseFirestore.instance
-        .collection('Home Accessories')
+        .collection('Products')
+        .where('prodCatagory', isEqualTo: 'Home Accessories')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
         _homeList.clear();
         value.docs.forEach((element) {
           print('id = ${element.id}');
-          _homeList.add(AddProductModel.fromMap(element.data()));
+          _homeList.add(ProductModel.fromMap(element.data()));
         });
-        _pList.addAll(_homeList);
 
         setState(() {});
       }
     });
 
+// ******** Kitchen Accessories *******
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .where('prodCatagory', isEqualTo: 'Kitchen Accessories')
+        .snapshots()
+        .listen((value) {
+      if (value.docs != null) {
+        _kitchenList.clear();
+        value.docs.forEach((element) {
+          print('id = ${element.id}');
+          _kitchenList.add(ProductModel.fromMap(element.data()));
+        });
+
+        setState(() {});
+      }
+    });
     // ******** Audio & Video List getting *******
     await FirebaseFirestore.instance
-        .collection('Audio & Video')
+        .collection('Products')
+        .where('prodCatagory', isEqualTo: 'Audio & Video')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
         _avList.clear();
         value.docs.forEach((element) {
           print('id = ${element.id}');
-          _avList.add(AddProductModel.fromMap(element.data()));
+          _avList.add(ProductModel.fromMap(element.data()));
         });
-        _pList.addAll(_avList);
 
         setState(() {});
       }
@@ -423,16 +436,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     // ******** others List *******
     await FirebaseFirestore.instance
-        .collection('Other')
+        .collection('Procucts')
+        .where('prodCatagory', isEqualTo: 'Other')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
         _otherList.clear();
         value.docs.forEach((element) {
           print('id = ${element.id}');
-          _otherList.add(AddProductModel.fromMap(element.data()));
+          _otherList.add(ProductModel.fromMap(element.data()));
         });
-        _pList.addAll(_otherList);
 
         setState(() {});
       }

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class AddProductModel {
+class ProductModel {
   String prodName;
   String sellerName;
   String prodUid;
@@ -16,7 +16,7 @@ class AddProductModel {
   double longitude;
   double latitude;
   int prodQuantity;
-  AddProductModel({
+  ProductModel({
     @required this.prodName,
     @required this.sellerName,
     @required this.prodUid,
@@ -52,8 +52,8 @@ class AddProductModel {
     };
   }
 
-  factory AddProductModel.fromMap(Map<String, dynamic> map) {
-    return AddProductModel(
+  factory ProductModel.fromMap(Map<String, dynamic> map) {
+    return ProductModel(
       prodName: map['prodName'],
       sellerName: map['sellerName'],
       prodUid: map['prodUid'],

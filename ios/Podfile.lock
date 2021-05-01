@@ -447,7 +447,7 @@ SPEC CHECKSUMS:
   FirebaseCoreDiagnostics: d50e11039e5984d92c8a512be2395f13df747350
   FirebaseFirestore: 1906bf163afdb7c432d2e3b5c40ceb9dd2df5820
   FirebaseStorage: 5002b1895bfe74a5ce92ad54f966e6162d0da2e5
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_money_formatter: d0d18ddc5be333fad8d09964d741b59fa11a91dc
   geocoder: 3cfab70531a0b367e917bafe82df4c30f6d4c45a
   geolocator: f7622e0e7e2a24718285b73916d60c4a54b9f5b6

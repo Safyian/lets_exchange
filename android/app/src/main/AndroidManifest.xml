@@ -7,7 +7,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="lets_exchange"
+        android:label="Let's Exchange"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"
         >

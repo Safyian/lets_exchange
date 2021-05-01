@@ -10,22 +10,27 @@ import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/product_details.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
-class ProductCard extends StatefulWidget {
+class CatagoryProductCard extends StatefulWidget {
   final ProductModel prodList;
 
-  ProductCard({@required this.prodList});
+  CatagoryProductCard({@required this.prodList});
 
   @override
-  _ProductCardState createState() => _ProductCardState();
+  _CatagoryProductCardState createState() => _CatagoryProductCardState();
 }
 
-class _ProductCardState extends State<ProductCard> {
+class _CatagoryProductCardState extends State<CatagoryProductCard> {
   bool tagFavourite;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    tagFavourite =
+        widget.prodList.favouriteBy.contains(Constant.userId) ? true : false;
+  }
 
   @override
   Widget build(BuildContext context) {
-    tagFavourite =
-        widget.prodList.favouriteBy.contains(Constant.userId) ? true : false;
     return GestureDetector(
       onTap: () {
         Get.to(ProductDetailsScreen(productDetail: widget.prodList));

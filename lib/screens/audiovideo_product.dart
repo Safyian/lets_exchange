@@ -10,7 +10,7 @@ import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/product_details.dart';
 
 class AudioVideoProduct extends StatefulWidget {
-  final List<AddProductModel> product;
+  final List<ProductModel> product;
   AudioVideoProduct({this.product});
   @override
   _AudioVideoProductState createState() => _AudioVideoProductState();

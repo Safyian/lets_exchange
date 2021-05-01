@@ -450,7 +450,7 @@ class _AddProductState extends State<AddProduct> {
           print('Images are here = $imageUrls');
           // ******* initialize model values *********
           var currentTime = DateTime.now();
-          AddProductModel addProductModel = AddProductModel(
+          ProductModel addProductModel = ProductModel(
             prodName: _prodName.text.toString(),
             sellerName: Constant.userName,
             prodUid: currentTime.microsecondsSinceEpoch.toString(),
@@ -467,7 +467,7 @@ class _AddProductState extends State<AddProduct> {
             favouriteBy: [],
           );
           await FirebaseFirestore.instance
-              .collection(addProductModel.prodCatagory)
+              .collection('Products')
               .doc(addProductModel.prodUid)
               .set(addProductModel.toMap())
               .then((value) {
