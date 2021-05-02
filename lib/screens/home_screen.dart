@@ -136,7 +136,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       // ********* POST Button *********
                       GestureDetector(
                         onTap: () {
-                          Get.to(AddProduct());
+                          ProductModel productModel = ProductModel(
+                              prodName: '',
+                              sellerName: '',
+                              prodUid: '',
+                              prodStatus: '',
+                              prodDescription: '',
+                              prodPrice: null,
+                              prodCatagory: null,
+                              prodImages: null,
+                              prodPostBy: '',
+                              prodDate: '',
+                              longitude: null,
+                              latitude: null,
+                              prodQuantity: null,
+                              favouriteBy: null);
+                          Get.to(AddProduct(productModel: productModel));
                         },
                         child: Container(
                           width: 65,
@@ -325,7 +340,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: _pList.length,
                 itemBuilder: (context, index) {
                   // ********* Card ********
-                  return ProductCard(prodList: _pList[index]);
+                  return ProductCard(
+                    prodList: _pList[index],
+                    onTap: () {
+                      Get.to(
+                          ProductDetailsScreen(productDetail: _pList[index]));
+                    },
+                    delete: false,
+                  );
                 },
                 staggeredTileBuilder: (_) => StaggeredTile.fit(2),
               ),

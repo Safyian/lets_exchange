@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
+import 'package:lets_exchange/screens/product_details.dart';
 
 import 'package:lets_exchange/widgets/product_card.dart';
 
@@ -20,6 +21,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   void initState() {
     getFvrtProducts();
     super.initState();
+    print('*********** init call **********');
   }
 
   @override
@@ -84,7 +86,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                 itemCount: fvrtList.length,
                 itemBuilder: (context, index) {
                   // ********* Card ********
-                  return ProductCard(prodList: fvrtList[index]);
+                  return ProductCard(
+                    prodList: fvrtList[index],
+                    onTap: () {
+                      Get.to(
+                          ProductDetailsScreen(productDetail: fvrtList[index]));
+                    },
+                    delete: false,
+                  );
                 },
                 staggeredTileBuilder: (_) => StaggeredTile.fit(2),
               ),
@@ -105,15 +114,20 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
         .snapshots()
         .listen((event) {
       if (event.docs != null) {
+        fvrtList.clear();
         event.docs.forEach((element) async {
-          fvrtList.clear();
           FirebaseFirestore.instance
               .collection('Products')
               .doc(element.id)
-              .snapshots()
-              .listen((event) async {
-            print('bbb = $event');
-            await fvrtList.add(ProductModel.fromMap(event.data()));
+              //     .snapshots()
+              //     .listen((event) async {
+              //   print('bbb = $event');
+              //   await fvrtList.add(ProductModel.fromMap(event.data()));
+              //   setState(() {});
+              // });
+              .get()
+              .then((value) {
+            fvrtList.add(ProductModel.fromMap(value.data()));
             setState(() {});
           });
         });

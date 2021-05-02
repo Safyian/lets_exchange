@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
+import 'package:lets_exchange/screens/add_product.dart';
 import 'package:lets_exchange/widgets/product_card.dart';
 
 class MyProducts extends StatefulWidget {
@@ -44,7 +45,28 @@ class _MyProductsState extends State<MyProducts> {
               itemBuilder: (context, index) {
                 print('post by = ${_myProduct[index].prodPostBy}');
                 // ********* Card ********
-                return ProductCard(prodList: _myProduct[index]);
+                return ProductCard(
+                  prodList: _myProduct[index],
+                  onTap: () {
+                    ProductModel productModel = ProductModel(
+                        prodName: _myProduct[index].prodName,
+                        sellerName: '',
+                        prodUid: _myProduct[index].prodUid,
+                        prodStatus: '',
+                        prodDescription: _myProduct[index].prodDescription,
+                        prodPrice: _myProduct[index].prodPrice,
+                        prodCatagory: _myProduct[index].prodCatagory,
+                        prodImages: _myProduct[index].prodImages,
+                        prodPostBy: '',
+                        prodDate: _myProduct[index].prodDate,
+                        longitude: _myProduct[index].longitude,
+                        latitude: _myProduct[index].latitude,
+                        prodQuantity: _myProduct[index].prodQuantity,
+                        favouriteBy: _myProduct[index].favouriteBy);
+                    Get.to(AddProduct(productModel: productModel));
+                  },
+                  delete: true,
+                );
               },
               staggeredTileBuilder: (_) => StaggeredTile.fit(2),
             ),

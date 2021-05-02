@@ -19,6 +19,8 @@ import 'package:location/location.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 
 class AddProduct extends StatefulWidget {
+  final ProductModel productModel;
+  AddProduct({@required this.productModel});
   @override
   _AddProductState createState() => _AddProductState();
 }
@@ -40,22 +42,21 @@ class _AddProductState extends State<AddProduct> {
     'Other'
   ];
   String _prodCatagory;
-  int _prodQuantity = 1;
+  int _prodQuantity;
   double _prodLongitude;
   double _prodLatitude;
   File _prodCoverImg;
   List<Asset> images = <Asset>[];
   int _current = 0;
-  List<String> imageUrls = <String>[];
+  List<String> imageUrls;
+  // = <String>[];
   String _error = 'No Error Dectected';
 
   final picker = ImagePicker();
 
   @override
   void initState() {
-    _prodDescription = TextEditingController();
-    _prodName = TextEditingController();
-    _prodPrice = TextEditingController();
+    initProductValues();
     super.initState();
   }
 
@@ -390,7 +391,7 @@ class _AddProductState extends State<AddProduct> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Text(
-                        'POST',
+                        widget.productModel.prodUid == '' ? 'POST' : 'Save',
                         style: TextStyle(
                             color: Colors.white, fontSize: Get.width * 0.05),
                       ),
@@ -405,12 +406,126 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
+  // initialize Model values
+  initProductValues() {
+    _prodName = widget.productModel.prodName != ''
+        ? TextEditingController(text: widget.productModel.prodName)
+        : TextEditingController();
+    _prodDescription = widget.productModel.prodDescription != ''
+        ? TextEditingController(text: widget.productModel.prodDescription)
+        : TextEditingController();
+    _prodPrice = widget.productModel.prodPrice != null
+        ? TextEditingController(text: widget.productModel.prodPrice.toString())
+        : TextEditingController();
+    _prodCatagory = widget.productModel.prodCatagory != ''
+        ? widget.productModel.prodCatagory
+        : null;
+    _prodLongitude = widget.productModel.longitude != null
+        ? widget.productModel.longitude
+        : null;
+    _prodLatitude = widget.productModel.latitude != null
+        ? widget.productModel.latitude
+        : null;
+    _prodQuantity = widget.productModel.prodQuantity != null
+        ? widget.productModel.prodQuantity
+        : 1;
+    imageUrls = widget.productModel.prodImages != null
+        ? widget.productModel.prodImages
+        : <String>[];
+  }
+
 // **************** Post Product method **************
   Future<void> postProduct() async {
     String image = '';
     UploadTask imageUploadTask;
     if (_formKey.currentState.validate()) {
-      if (images != null && _prodLatitude != null && _prodLongitude != null) {
+      if (widget.productModel.prodUid == '') {
+        if (images != null && _prodLatitude != null && _prodLongitude != null) {
+          try {
+            Get.defaultDialog(
+              title: 'Please wait',
+              middleText: 'Posting your Product...',
+              actions: [
+                SpinKitFadingCircle(
+                  color: Constant.btnWidgetColor,
+                  size: Get.width * 0.12,
+                ),
+              ],
+            );
+            //
+            // //Create a reference to the location you want to upload to in firebase
+            // Reference reference = FirebaseStorage.instance
+            //     .ref()
+            //     .child('pictures')
+            //     .child(DateTime.now().millisecondsSinceEpoch.toString());
+
+            // //Upload the file to firebase
+            // imageUploadTask = reference.putFile(_prodCoverImg);
+
+            // // Waits till the file is uploaded then stores the download url
+            // await imageUploadTask.whenComplete(() {
+            //   print('image uploaded');
+            // });
+            // // getting image url
+            // reference.getDownloadURL().then((url) async {
+            //   image = url.toString();
+
+            for (var imageFile in images) {
+              await Services().postImage(imageFile).then((downloadUrl) {
+                imageUrls.add(downloadUrl.toString());
+              });
+
+              setState(() {});
+            }
+            print('Images are here = $imageUrls');
+            // ******* initialize model values *********
+            var currentTime = DateTime.now();
+            ProductModel addProductModel = ProductModel(
+              prodName: _prodName.text.toString(),
+              sellerName: Constant.userName,
+              prodUid: currentTime.microsecondsSinceEpoch.toString(),
+              prodStatus: 'pending',
+              prodDescription: _prodDescription.text.toString(),
+              prodCatagory: _prodCatagory,
+              prodQuantity: _prodQuantity,
+              prodPrice: double.parse(_prodPrice.text.toString()),
+              latitude: _prodLatitude,
+              longitude: _prodLongitude,
+              prodImages: imageUrls,
+              prodDate: currentTime.toString(),
+              prodPostBy: Constant.userId,
+              favouriteBy: [],
+            );
+            await FirebaseFirestore.instance
+                .collection('Products')
+                .doc(addProductModel.prodUid)
+                .set(addProductModel.toMap(), SetOptions(merge: true))
+                .then((value) {
+              _prodName.clear();
+              _prodDescription.clear();
+              _prodPrice.clear();
+              _prodCatagory = null;
+              _prodQuantity = 1;
+              _prodLongitude = null;
+              _prodLatitude = null;
+              images.clear();
+              setState(() {});
+              Get.back();
+              Authentication.showError(
+                  'Success', 'Your Product is Posted Successfully!');
+              // });
+            });
+          } catch (e) {
+            Get.back();
+            Authentication.showError('Error', '${e.message}');
+          }
+        } else if (images == null && _prodLatitude != null)
+          Authentication.showError('Empty', 'Please add a Picture');
+        else if (images != null && _prodLatitude == null)
+          Authentication.showError('Empty', 'Please select you Location');
+        else
+          Authentication.showError('Empty', 'Please add Picture and Location');
+      } else if (widget.productModel.prodUid != '') {
         try {
           Get.defaultDialog(
             title: 'Please wait',
@@ -422,38 +537,13 @@ class _AddProductState extends State<AddProduct> {
               ),
             ],
           );
-          //
-          // //Create a reference to the location you want to upload to in firebase
-          // Reference reference = FirebaseStorage.instance
-          //     .ref()
-          //     .child('pictures')
-          //     .child(DateTime.now().millisecondsSinceEpoch.toString());
 
-          // //Upload the file to firebase
-          // imageUploadTask = reference.putFile(_prodCoverImg);
-
-          // // Waits till the file is uploaded then stores the download url
-          // await imageUploadTask.whenComplete(() {
-          //   print('image uploaded');
-          // });
-          // // getting image url
-          // reference.getDownloadURL().then((url) async {
-          //   image = url.toString();
-
-          for (var imageFile in images) {
-            await Services().postImage(imageFile).then((downloadUrl) {
-              imageUrls.add(downloadUrl.toString());
-            });
-
-            setState(() {});
-          }
-          print('Images are here = $imageUrls');
           // ******* initialize model values *********
           var currentTime = DateTime.now();
           ProductModel addProductModel = ProductModel(
             prodName: _prodName.text.toString(),
             sellerName: Constant.userName,
-            prodUid: currentTime.microsecondsSinceEpoch.toString(),
+            prodUid: widget.productModel.prodUid,
             prodStatus: 'pending',
             prodDescription: _prodDescription.text.toString(),
             prodCatagory: _prodCatagory,
@@ -462,23 +552,15 @@ class _AddProductState extends State<AddProduct> {
             latitude: _prodLatitude,
             longitude: _prodLongitude,
             prodImages: imageUrls,
-            prodDate: currentTime.toString(),
+            prodDate: widget.productModel.prodDate,
             prodPostBy: Constant.userId,
-            favouriteBy: [],
+            favouriteBy: widget.productModel.favouriteBy,
           );
           await FirebaseFirestore.instance
               .collection('Products')
               .doc(addProductModel.prodUid)
-              .set(addProductModel.toMap())
+              .set(addProductModel.toMap(), SetOptions(merge: true))
               .then((value) {
-            _prodName.clear();
-            _prodDescription.clear();
-            _prodPrice.clear();
-            _prodCatagory = null;
-            _prodQuantity = 1;
-            _prodLongitude = null;
-            _prodLatitude = null;
-            images.clear();
             setState(() {});
             Get.back();
             Authentication.showError(
@@ -489,12 +571,7 @@ class _AddProductState extends State<AddProduct> {
           Get.back();
           Authentication.showError('Error', '${e.message}');
         }
-      } else if (images == null && _prodLatitude != null)
-        Authentication.showError('Empty', 'Please add a Picture');
-      else if (images != null && _prodLatitude == null)
-        Authentication.showError('Empty', 'Please select you Location');
-      else
-        Authentication.showError('Empty', 'Please add Picture and Location');
+      }
     }
   }
 
@@ -531,7 +608,10 @@ class _AddProductState extends State<AddProduct> {
                     padding: const EdgeInsets.only(
                       bottom: 22.0,
                     ),
-                    child: Text('Add Product',
+                    child: Text(
+                        widget.productModel.prodUid == ''
+                            ? 'Add Product'
+                            : 'Edit Product',
                         style: GoogleFonts.pacifico(
                           color: Constant.iconColor,
                           fontSize: Get.width * 0.055,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/const/const.dart';
+import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/add_product.dart';
 import 'package:lets_exchange/screens/my_products.dart';
 
@@ -68,7 +69,22 @@ class CustomDrawer extends StatelessWidget {
             ),
             InkWell(
               onTap: () {
-                Get.to(AddProduct());
+                ProductModel productModel = ProductModel(
+                    prodName: '',
+                    sellerName: '',
+                    prodUid: '',
+                    prodStatus: '',
+                    prodDescription: '',
+                    prodPrice: null,
+                    prodCatagory: null,
+                    prodImages: null,
+                    prodPostBy: '',
+                    prodDate: '',
+                    longitude: null,
+                    latitude: null,
+                    prodQuantity: null,
+                    favouriteBy: null);
+                Get.to(AddProduct(productModel: productModel));
               },
               child: ListTile(
                 title: Text('Add Product'),

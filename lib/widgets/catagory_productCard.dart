@@ -23,7 +23,6 @@ class _CatagoryProductCardState extends State<CatagoryProductCard> {
   bool tagFavourite;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     tagFavourite =
         widget.prodList.favouriteBy.contains(Constant.userId) ? true : false;
