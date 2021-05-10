@@ -2,13 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lets_exchange/auth_helper/services.dart';
-
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/catagory_model.dart';
 import 'package:lets_exchange/model/product_model.dart';
@@ -31,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   List<ProductModel> _pList = [];
-  List id = [];
+  List<ProductModel> pListfilter = [];
   List<ProductModel> _computerMobList = [];
   List<ProductModel> _kitchenList = [];
   List<ProductModel> _homeList = [];
@@ -39,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<ProductModel> _avList = [];
   List<ProductModel> _otherList = [];
   bool search = false;
+  TextEditingController searchController = TextEditingController();
   List<CatagoryModel> catagoryList = [
     CatagoryModel(catagory: 'Kitchen', image: 'assets/kitchen.png'),
     CatagoryModel(catagory: 'Home', image: 'assets/home.png'),
@@ -52,10 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getProducts();
+    searchController.addListener(() {
+      filterList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isSearching = searchController.text.isNotEmpty;
     print('object = ${_pList.length}');
     _pList.sort(
         (a, b) => a.prodName.toLowerCase().compareTo(b.prodName.toLowerCase()));
@@ -181,177 +182,166 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       backgroundColor: Constant.background,
-      body: SingleChildScrollView(
-        child: Container(
-          color: Constant.background,
-          margin: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              //************ Search Bar ************
-              search
-                  ? Row(
-                      children: [
-                        Container(
-                          width: Get.width * 0.8,
-                          child: TextFormField(
-                            // controller: search,
-                            style: TextStyle(fontSize: Get.width * 0.04),
-                            decoration: inputDecoration.copyWith(
-                              prefixIcon: Icon(
-                                Icons.search,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(new FocusNode());
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            color: Constant.background,
+            margin: EdgeInsets.all(12),
+            child: Column(
+              children: [
+                //************ Search Bar ************
+                search
+                    ? Container(
+                        width: Get.width,
+                        child: TextFormField(
+                          controller: searchController,
+                          style: TextStyle(fontSize: Get.width * 0.04),
+                          decoration: inputDecoration.copyWith(
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: Constant.btnWidgetColor,
+                            ),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                searchController.clear();
+                              },
+                              child: Icon(
+                                Icons.clear,
                                 color: Constant.btnWidgetColor,
                               ),
-                              suffixIcon: GestureDetector(
-                                onTap: () {
-                                  // search.clear();
-                                },
-                                child: Icon(
-                                  Icons.clear,
-                                  color: Constant.btnWidgetColor,
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[200])),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[200])),
-                              hintText: 'Search',
                             ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[200])),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[200])),
+                            hintText: 'Search',
                           ),
                         ),
-                        SizedBox(
-                          width: Get.width * 0.01,
-                        ),
-                        // *********** Filter Button *******
-                        GestureDetector(
-                          onTap: () => _scaffoldKey.currentState.openDrawer(),
-                          child: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              color: Colors.white,
-                            ),
-                            child: Icon(
-                              Ionicons.ios_color_filter,
-                              color: Constant.iconColor,
-                              size: 28,
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
-              search
-                  ? SizedBox(
-                      height: Get.height * 0.01,
-                    )
-                  : SizedBox(),
+                      )
+                    : SizedBox(),
+                search
+                    ? SizedBox(
+                        height: Get.height * 0.01,
+                      )
+                    : SizedBox(),
 
-              // ******** Catagories Icon List  *******
-              Container(
-                width: Get.width,
-                height: 100,
-                // height: Get.height * 0.12,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: catagoryList.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        if (index == 0)
-                          Get.to(KitchenProduct(
-                            product: _kitchenList,
-                          ));
-                        if (index == 1)
-                          Get.to(HomeProduct(
-                            product: _homeList,
-                          ));
-                        if (index == 2)
-                          Get.to(ComputerMobileProduct(
-                            product: _computerMobList,
-                          ));
-                        if (index == 3)
-                          Get.to(GameProduct(
-                            product: _gameList,
-                          ));
-                        if (index == 4)
-                          Get.to(AudioVideoProduct(
-                            product: _avList,
-                          ));
-                      },
-                      child: Container(
-                        width: Get.width * 0.235,
-                        child: Card(
-                          color: Colors.white,
-                          elevation: 4.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 35,
-                                  height: 35,
-                                  child: Image.asset(catagoryList[index].image),
-                                ),
-                                SizedBox(
-                                  height: 8.0,
-                                ),
-                                Center(
-                                  child: Text(
-                                    catagoryList[index].catagory,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: Get.width * 0.028,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
+                // ******** Catagories Icon List  *******
+                Container(
+                  width: Get.width,
+                  height: 100,
+                  // height: Get.height * 0.12,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: catagoryList.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          if (index == 0)
+                            Get.to(KitchenProduct(
+                              product: _kitchenList,
+                            ));
+                          if (index == 1)
+                            Get.to(HomeProduct(
+                              product: _homeList,
+                            ));
+                          if (index == 2)
+                            Get.to(ComputerMobileProduct(
+                              product: _computerMobList,
+                            ));
+                          if (index == 3)
+                            Get.to(GameProduct(
+                              product: _gameList,
+                            ));
+                          if (index == 4)
+                            Get.to(AudioVideoProduct(
+                              product: _avList,
+                            ));
+                        },
+                        child: Container(
+                          width: Get.width * 0.235,
+                          child: Card(
+                            color: Colors.white,
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 35,
+                                    height: 35,
+                                    child:
+                                        Image.asset(catagoryList[index].image),
                                   ),
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 8.0,
+                                  ),
+                                  Center(
+                                    child: Text(
+                                      catagoryList[index].catagory,
+                                      style: GoogleFonts.roboto(
+                                          fontSize: Get.width * 0.028,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      );
+                    },
+                  ),
+                ),
+
+                SizedBox(
+                  height: Get.height * 0.01,
+                ),
+
+                // ********** GridView Starts here ********
+                StaggeredGridView.countBuilder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 6.0,
+                  mainAxisSpacing: 6.0,
+                  itemCount:
+                      isSearching == true ? pListfilter.length : _pList.length,
+                  itemBuilder: (context, index) {
+                    ProductModel prodModel = isSearching == true
+                        ? pListfilter[index]
+                        : _pList[index];
+                    // ********* Card ********
+                    return ProductCard(
+                      // prodList: _pList[index],
+                      prodList: prodModel,
+                      onTap: () {
+                        Get.to(
+                          // ProductDetailsScreen(productDetail: _pList[index]),
+                          ProductDetailsScreen(productDetail: prodModel),
+                        );
+                      },
+                      delete: false,
                     );
                   },
+                  staggeredTileBuilder: (_) => StaggeredTile.fit(2),
                 ),
-              ),
-
-              SizedBox(
-                height: Get.height * 0.01,
-              ),
-
-              // ********** GridView Starts here ********
-              StaggeredGridView.countBuilder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                crossAxisCount: 4,
-                crossAxisSpacing: 6.0,
-                mainAxisSpacing: 6.0,
-                itemCount: _pList.length,
-                itemBuilder: (context, index) {
-                  // ********* Card ********
-                  return ProductCard(
-                    prodList: _pList[index],
-                    onTap: () {
-                      Get.to(
-                          ProductDetailsScreen(productDetail: _pList[index]));
-                    },
-                    delete: false,
-                  );
-                },
-                staggeredTileBuilder: (_) => StaggeredTile.fit(2),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -472,5 +462,27 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {});
       }
     });
+  }
+
+  //
+  //
+  filterList() {
+    List<ProductModel> _product = [];
+    _product.addAll(_pList);
+    if (searchController.text.isNotEmpty) {
+      _product.retainWhere((element) {
+        String searchTerm = searchController.text.toLowerCase();
+        String productName = element.prodName.toLowerCase();
+        return productName.contains(searchTerm);
+      });
+
+      setState(() {
+        pListfilter = _product;
+      });
+    } else {
+      setState(() {
+        searchController.text.isEmpty;
+      });
+    }
   }
 }

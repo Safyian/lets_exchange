@@ -239,7 +239,7 @@ class _AddProductState extends State<AddProduct> {
                           } else
                             return null;
                         },
-                        keyboardType: TextInputType.text,
+                        keyboardType: TextInputType.multiline,
                         textCapitalization: TextCapitalization.sentences,
                         maxLines: null,
                       ),

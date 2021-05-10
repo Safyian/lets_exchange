@@ -61,29 +61,32 @@ class _CatagoryProductCardState extends State<CatagoryProductCard> {
                         fit: BoxFit.cover),
                   ),
                   // Favourite icon
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            tagFavourite = !tagFavourite;
-                          });
-                          addtoFavourite(uid: widget.prodList.prodUid);
-                        },
-                        child: Container(
-                          child: Icon(
-                            tagFavourite
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: tagFavourite ? Colors.red : Colors.white,
-                            size: Get.width * 0.08,
+                  widget.prodList.prodPostBy == Constant.userId
+                      ? Container()
+                      : Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  tagFavourite = !tagFavourite;
+                                });
+                                addtoFavourite(uid: widget.prodList.prodUid);
+                              },
+                              child: Container(
+                                child: Icon(
+                                  tagFavourite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color:
+                                      tagFavourite ? Colors.red : Colors.white,
+                                  size: Get.width * 0.08,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  )
+                        )
                 ],
               ),
             ),

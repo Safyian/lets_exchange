@@ -17,87 +17,100 @@ class FavouriteScreen extends StatefulWidget {
 
 class _FavouriteScreenState extends State<FavouriteScreen> {
   List<ProductModel> fvrtList = [];
+  List<ProductModel> fvrtFilter = [];
+  TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     getFvrtProducts();
     super.initState();
-    print('*********** init call **********');
+    searchController.addListener(() {
+      filterList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isSearching = searchController.text.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Constant.primary,
         elevation: 0.0,
       ),
       backgroundColor: Constant.background,
-      body: SingleChildScrollView(
-        child: Container(
-          // width: Get.width,
-          // height: Get.height,
-          color: Constant.background,
-          margin: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              // ********** Search Bar ********
-              Container(
-                width: Get.width,
-                child: TextFormField(
-                  // controller: search,
-                  style: TextStyle(fontSize: Get.width * 0.04),
-                  decoration: inputDecoration.copyWith(
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Constant.btnWidgetColor,
-                    ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        // search.clear();
-                      },
-                      child: Icon(
-                        Icons.clear,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(new FocusNode());
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            // width: Get.width,
+            // height: Get.height,
+            color: Constant.background,
+            margin: EdgeInsets.all(12),
+            child: Column(
+              children: [
+                // ********** Search Bar ********
+                Container(
+                  width: Get.width,
+                  child: TextFormField(
+                    controller: searchController,
+                    style: TextStyle(fontSize: Get.width * 0.04),
+                    decoration: inputDecoration.copyWith(
+                      prefixIcon: Icon(
+                        Icons.search,
                         color: Constant.btnWidgetColor,
                       ),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          searchController.clear();
+                        },
+                        child: Icon(
+                          Icons.clear,
+                          color: Constant.btnWidgetColor,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                          borderSide: BorderSide(color: Colors.grey[200])),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                          borderSide: BorderSide(color: Colors.grey[200])),
+                      hintText: 'Search',
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16.0),
-                        borderSide: BorderSide(color: Colors.grey[200])),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16.0),
-                        borderSide: BorderSide(color: Colors.grey[200])),
-                    hintText: 'Search',
                   ),
                 ),
-              ),
 
-              SizedBox(
-                height: Get.height * 0.01,
-              ),
-              // ********** GridView Starts here ********
-              StaggeredGridView.countBuilder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                crossAxisCount: 4,
-                crossAxisSpacing: 6.0,
-                mainAxisSpacing: 6.0,
-                itemCount: fvrtList.length,
-                itemBuilder: (context, index) {
-                  // ********* Card ********
-                  return ProductCard(
-                    prodList: fvrtList[index],
-                    onTap: () {
-                      Get.to(
-                          ProductDetailsScreen(productDetail: fvrtList[index]));
-                    },
-                    delete: false,
-                  );
-                },
-                staggeredTileBuilder: (_) => StaggeredTile.fit(2),
-              ),
-            ],
+                SizedBox(
+                  height: Get.height * 0.01,
+                ),
+                // ********** GridView Starts here ********
+                StaggeredGridView.countBuilder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 6.0,
+                  mainAxisSpacing: 6.0,
+                  itemCount:
+                      isSearching == true ? fvrtFilter.length : fvrtList.length,
+                  itemBuilder: (context, index) {
+                    ProductModel prodModel = isSearching == true
+                        ? fvrtFilter[index]
+                        : fvrtList[index];
+                    // ********* Card ********
+                    return ProductCard(
+                      prodList: prodModel,
+                      onTap: () {
+                        Get.to(ProductDetailsScreen(productDetail: prodModel));
+                      },
+                      delete: false,
+                    );
+                  },
+                  staggeredTileBuilder: (_) => StaggeredTile.fit(2),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -134,5 +147,26 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
         setState(() {});
       }
     });
+  }
+
+  //
+  filterList() {
+    List<ProductModel> _product = [];
+    _product.addAll(fvrtList);
+    if (searchController.text.isNotEmpty) {
+      _product.retainWhere((element) {
+        String searchTerm = searchController.text.toLowerCase();
+        String productName = element.prodName.toLowerCase();
+        return productName.contains(searchTerm);
+      });
+
+      setState(() {
+        fvrtFilter = _product;
+      });
+    } else {
+      setState(() {
+        searchController.text.isEmpty;
+      });
+    }
   }
 }
