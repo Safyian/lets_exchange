@@ -1,7 +1,5 @@
-import 'dart:developer';
-
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geocoder/geocoder.dart';
@@ -11,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
+import 'package:lets_exchange/screens/chat_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel productDetail;
@@ -282,7 +281,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       // ********* Chat Floating Button *******
       floatingActionButton: FloatingActionButton(
         backgroundColor: Constant.btnWidgetColor,
-        onPressed: () {},
+        onPressed: () {
+          Get.to(ChatScreen(
+              Name: widget.productDetail.sellerName,
+              uid: widget.productDetail.prodPostBy));
+        },
         elevation: 14,
         child: Icon(Icons.chat, size: Get.width * 0.055),
       ),
