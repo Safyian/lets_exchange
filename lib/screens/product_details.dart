@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -9,7 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
+import 'package:lets_exchange/screens/add_product.dart';
 import 'package:lets_exchange/screens/chat_screen.dart';
+import 'package:lets_exchange/screens/my_chats.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel productDetail;
@@ -279,30 +282,159 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       // Bottom Section with Floating Chat Button
       //
       // ********* Chat Floating Button *******
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Constant.btnWidgetColor,
-        onPressed: () {
-          Get.to(ChatScreen(
-              Name: widget.productDetail.sellerName,
-              uid: widget.productDetail.prodPostBy));
-        },
-        elevation: 14,
-        child: Icon(Icons.chat, size: Get.width * 0.055),
-      ),
+      floatingActionButton: widget.productDetail.prodPostBy == Constant.userId
+          ? SizedBox()
+          : FloatingActionButton(
+              backgroundColor: Constant.btnWidgetColor,
+              onPressed: () {
+                Get.to(ChatScreen(
+                  Name: widget.productDetail.sellerName,
+                  uid: widget.productDetail.prodPostBy,
+                ));
+              },
+              elevation: 14,
+              child: Icon(Icons.chat, size: Get.width * 0.055),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       //
-      bottomNavigationBar: BottomAppBar(
-        color: Constant.primary,
-        shape: CircularNotchedRectangle(),
-        child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox(width: Get.width * 0.025),
-            // Buy Now Button
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
+      bottomNavigationBar: widget.productDetail.prodPostBy == Constant.userId
+          ? SizedBox()
+          : BottomAppBar(
+              color: Constant.primary,
+              shape: CircularNotchedRectangle(),
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(width: Get.width * 0.025),
+                  // Buy Now Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _showDialog(model: widget.productDetail);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Constant.btnWidgetColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Buy Now',
+                        style: TextStyle(
+                          fontSize: Get.width * 0.042,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: Get.width * 0.025),
+                  // Exchange Button
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      primary: Constant.btnWidgetColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Exchange',
+                      style: TextStyle(
+                        fontSize: Get.width * 0.042,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: Get.width * 0.025),
+                  // Bid Button
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      primary: Constant.btnWidgetColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.location_pin,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+
+//
+// user defined function
+  void _showDialog({@required ProductModel model}) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text("Confirm!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Please double check Product details:",
+                style: TextStyle(
+                    fontSize: Get.width * 0.04, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: Get.width * 0.06),
+              Row(
+                children: [
+                  Text(
+                    'Product: ',
+                    style: TextStyle(
+                      fontSize: Get.width * 0.045,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    model.prodName,
+                    style: TextStyle(
+                        fontSize: Get.width * 0.045,
+                        fontWeight: FontWeight.w600,
+                        color: Constant.btnWidgetColor),
+                  ),
+                ],
+              ),
+              SizedBox(height: Get.width * 0.015),
+              Row(
+                children: [
+                  Text(
+                    'Price: ',
+                    style: TextStyle(
+                      fontSize: Get.width * 0.045,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    "Rs. ${model.prodPrice.toInt()}",
+                    style: TextStyle(
+                        fontSize: Get.width * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            // Buy or Cancel buttons
+            Container(
+              width: Get.width * 0.25,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // send Buy message request
+                  sendMessage();
+                },
                 style: ElevatedButton.styleFrom(
                   primary: Constant.btnWidgetColor,
                   shape: RoundedRectangleBorder(
@@ -310,7 +442,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ),
                 child: Text(
-                  'Buy Now',
+                  'Buy',
                   style: TextStyle(
                     fontSize: Get.width * 0.042,
                     fontWeight: FontWeight.w600,
@@ -318,42 +450,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
               ),
             ),
-            SizedBox(width: Get.width * 0.025),
-            // Exchange Button
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                primary: Constant.btnWidgetColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+
+            Container(
+              width: Get.width * 0.25,
+              child: ElevatedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Constant.btnWidgetColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Exchange',
-                style: TextStyle(
-                  fontSize: Get.width * 0.042,
-                  fontWeight: FontWeight.w600,
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontSize: Get.width * 0.042,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(width: Get.width * 0.025),
-            // Bid Button
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                primary: Constant.btnWidgetColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Icon(
-                Icons.location_pin,
-                color: Colors.white,
               ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -399,5 +520,91 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             : "${DateTime.now().difference(DateTime.parse(widget.productDetail.prodDate)).inDays} days ago";
     print('differenceInDays = $duration');
     setState(() {});
+  }
+
+// send message method
+  sendMessage() async {
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(Constant.userId)
+        .collection('messages')
+        .doc(widget.productDetail.prodPostBy)
+        .set({'id': widget.productDetail.prodPostBy});
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(Constant.userId)
+        .collection('messages')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('chating')
+        .add({
+      'message': 'Hi there!\nI want to Buy this Product',
+      'sendTo': widget.productDetail.prodPostBy,
+      'sendBy': Constant.userId,
+      'time': DateTime.now(),
+    });
+    ////
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('messages')
+        .doc(Constant.userId)
+        .set({'id': Constant.userId});
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('messages')
+        .doc(Constant.userId)
+        .collection('chating')
+        .add({
+      'message': 'Hi there!\nI want to Buy this Product',
+      'sendTo': widget.productDetail.prodPostBy,
+      'sendBy': Constant.userId,
+      'time': DateTime.now(),
+    });
+
+    // prod image
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(Constant.userId)
+        .collection('messages')
+        .doc(widget.productDetail.prodPostBy)
+        .set({'id': widget.productDetail.prodPostBy});
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(Constant.userId)
+        .collection('messages')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('chating')
+        .add({
+      'message': widget.productDetail.prodImages[0],
+      'sendTo': widget.productDetail.prodPostBy,
+      'sendBy': Constant.userId,
+      'time': DateTime.now(),
+    });
+    ////
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('messages')
+        .doc(Constant.userId)
+        .set({'id': Constant.userId});
+    await FirebaseFirestore.instance
+        .collection('Chats')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('messages')
+        .doc(Constant.userId)
+        .collection('chating')
+        .add({
+      'message': widget.productDetail.prodImages[0],
+      'sendTo': widget.productDetail.prodPostBy,
+      'sendBy': Constant.userId,
+      'time': DateTime.now(),
+    });
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.productDetail.prodUid)
+        .set({
+      'buyRequests': FieldValue.arrayUnion([Constant.userId])
+    }, SetOptions(merge: true));
   }
 }

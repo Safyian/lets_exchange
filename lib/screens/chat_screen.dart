@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/chat_model.dart';
+import 'package:lets_exchange/model/product_model.dart';
 
 class ChatScreen extends StatefulWidget {
   String Name;
   String uid;
+
   ChatScreen({this.Name, this.uid});
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -15,6 +17,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   var chatController;
   List<ChatModel> _chatList = [];
+
   @override
   void initState() {
     chatController = TextEditingController();
@@ -25,6 +28,8 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     _chatList.sort((a, b) => a.time.compareTo(b.time));
+    //
+
     return Scaffold(
       backgroundColor: Constant.background,
       // ********** AppBar ********
@@ -180,31 +185,72 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // msg Container
   Widget msgContainer({@required String msg, @required String uid}) {
-    return Container(
-      padding: EdgeInsets.only(top: 8, bottom: 8),
-      child: Align(
-        alignment:
-            uid == Constant.userId ? Alignment.topRight : Alignment.topLeft,
-        child: Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-            constraints: BoxConstraints(maxWidth: Get.width * 0.7),
-            decoration: BoxDecoration(
-                color: Constant.primary,
-                borderRadius: BorderRadius.only(
-                    topRight: uid == Constant.userId
-                        ? Radius.circular(0)
-                        : Radius.circular(12),
-                    topLeft: Radius.circular(12),
-                    bottomLeft: uid == Constant.userId
-                        ? Radius.circular(12)
-                        : Radius.circular(0),
-                    bottomRight: Radius.circular(12))),
-            child: Text(
-              msg,
-              style: TextStyle(fontSize: Get.width * 0.04),
-              // textAlign: TextAlign.center,
-            )),
-      ),
-    );
+    return msg.contains('https:')
+        ? Container(
+            padding: EdgeInsets.only(top: 8, bottom: 8),
+            child: Align(
+                alignment: uid == Constant.userId
+                    ? Alignment.topRight
+                    : Alignment.topLeft,
+                child: Container(
+                    // padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                    width: Get.width * 0.7,
+                    height: Get.height * 0.5,
+                    // constraints: BoxConstraints(
+                    //     maxWidth: Get.width * 0.7, maxHeight: Get.height * 0.5),
+                    decoration: BoxDecoration(
+                        // color: Constant.primary,
+                        borderRadius: BorderRadius.only(
+                            topRight: uid == Constant.userId
+                                ? Radius.circular(0)
+                                : Radius.circular(12),
+                            topLeft: Radius.circular(12),
+                            bottomLeft: uid == Constant.userId
+                                ? Radius.circular(12)
+                                : Radius.circular(0),
+                            bottomRight: Radius.circular(12))),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                          topRight: uid == Constant.userId
+                              ? Radius.circular(0)
+                              : Radius.circular(12),
+                          topLeft: Radius.circular(12),
+                          bottomLeft: uid == Constant.userId
+                              ? Radius.circular(12)
+                              : Radius.circular(0),
+                          bottomRight: Radius.circular(12)),
+                      child: Image.network(
+                        msg,
+                        fit: BoxFit.cover,
+                      ),
+                    ))),
+          )
+        : Container(
+            padding: EdgeInsets.only(top: 8, bottom: 8),
+            child: Align(
+              alignment: uid == Constant.userId
+                  ? Alignment.topRight
+                  : Alignment.topLeft,
+              child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                  constraints: BoxConstraints(maxWidth: Get.width * 0.7),
+                  decoration: BoxDecoration(
+                      color: Constant.primary,
+                      borderRadius: BorderRadius.only(
+                          topRight: uid == Constant.userId
+                              ? Radius.circular(0)
+                              : Radius.circular(12),
+                          topLeft: Radius.circular(12),
+                          bottomLeft: uid == Constant.userId
+                              ? Radius.circular(12)
+                              : Radius.circular(0),
+                          bottomRight: Radius.circular(12))),
+                  child: Text(
+                    msg,
+                    style: TextStyle(fontSize: Get.width * 0.04),
+                    // textAlign: TextAlign.center,
+                  )),
+            ),
+          );
   }
 }

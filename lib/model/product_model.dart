@@ -10,6 +10,7 @@ class ProductModel {
   double prodPrice;
   String prodCatagory;
   List<String> prodImages;
+  List<String> buyRequests;
   List<String> favouriteBy;
   String prodPostBy;
   String prodDate;
@@ -31,6 +32,7 @@ class ProductModel {
     @required this.latitude,
     @required this.prodQuantity,
     @required this.favouriteBy,
+    @required this.buyRequests,
   });
 
   Map<String, dynamic> toMap() {
@@ -49,6 +51,7 @@ class ProductModel {
       'longitude': longitude,
       'latitude': latitude,
       'prodQuantity': prodQuantity,
+      'buyRequests': buyRequests,
     };
   }
 
@@ -62,6 +65,7 @@ class ProductModel {
       prodPrice: map['prodPrice'],
       prodCatagory: map['prodCatagory'],
       prodImages: List<String>.from(map['prodImages']),
+      buyRequests: List<String>.from(map['buyRequests']),
       favouriteBy: List<String>.from(map['favouriteBy']),
       prodPostBy: map['prodPostBy'],
       prodDate: map['prodDate'],

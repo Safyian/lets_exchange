@@ -146,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               prodPrice: null,
                               prodCatagory: null,
                               prodImages: null,
+                              buyRequests: null,
                               prodPostBy: '',
                               prodDate: '',
                               longitude: null,
