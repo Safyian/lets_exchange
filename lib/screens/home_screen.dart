@@ -146,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               prodPrice: null,
                               prodCatagory: null,
                               prodImages: null,
-                              buyRequests: null,
                               prodPostBy: '',
                               prodDate: '',
                               longitude: null,
@@ -354,6 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // ******** All Products *******
     await FirebaseFirestore.instance
         .collection('Products')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) async {
       if (value.docs != null) {
@@ -368,6 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Products')
         .where('prodCatagory', isEqualTo: 'Computers & Mobiles')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
@@ -384,6 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Products')
         .where('prodCatagory', isEqualTo: 'Games')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
@@ -401,6 +403,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Products')
         .where('prodCatagory', isEqualTo: 'Home Accessories')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
@@ -418,6 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Products')
         .where('prodCatagory', isEqualTo: 'Kitchen Accessories')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
@@ -434,6 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Products')
         .where('prodCatagory', isEqualTo: 'Audio & Video')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {
@@ -451,6 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance
         .collection('Procucts')
         .where('prodCatagory', isEqualTo: 'Other')
+        .where('prodStatus', isEqualTo: 'pending')
         .snapshots()
         .listen((value) {
       if (value.docs != null) {

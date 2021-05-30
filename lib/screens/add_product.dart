@@ -484,7 +484,7 @@ class _AddProductState extends State<AddProduct> {
               prodName: _prodName.text.toString(),
               sellerName: Constant.userName,
               prodUid: currentTime.microsecondsSinceEpoch.toString(),
-              prodStatus: 'pending',
+              prodStatus: _prodQuantity == 0 ? 'sold' : 'pending',
               prodDescription: _prodDescription.text.toString(),
               prodCatagory: _prodCatagory,
               prodQuantity: _prodQuantity,
@@ -495,7 +495,6 @@ class _AddProductState extends State<AddProduct> {
               prodDate: currentTime.toString(),
               prodPostBy: Constant.userId,
               favouriteBy: [],
-              buyRequests: [],
             );
             await FirebaseFirestore.instance
                 .collection('Products')
@@ -545,7 +544,7 @@ class _AddProductState extends State<AddProduct> {
             prodName: _prodName.text.toString(),
             sellerName: Constant.userName,
             prodUid: widget.productModel.prodUid,
-            prodStatus: 'pending',
+            prodStatus: _prodQuantity == 0 ? 'sold' : 'pending',
             prodDescription: _prodDescription.text.toString(),
             prodCatagory: _prodCatagory,
             prodQuantity: _prodQuantity,
@@ -556,7 +555,6 @@ class _AddProductState extends State<AddProduct> {
             prodDate: widget.productModel.prodDate,
             prodPostBy: Constant.userId,
             favouriteBy: widget.productModel.favouriteBy,
-            buyRequests: [],
           );
           await FirebaseFirestore.instance
               .collection('Products')

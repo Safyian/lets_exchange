@@ -432,8 +432,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               width: Get.width * 0.25,
               child: ElevatedButton(
                 onPressed: () {
-                  // send Buy message request
-                  sendMessage();
+                  // send Buy request
+                  buyNow();
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Constant.btnWidgetColor,
@@ -522,89 +522,26 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     setState(() {});
   }
 
-// send message method
-  sendMessage() async {
+// buy now method
+  buyNow() async {
+    String reqUid = DateTime.now().millisecondsSinceEpoch.toString();
     await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(Constant.userId)
-        .collection('messages')
+        .collection('users')
         .doc(widget.productDetail.prodPostBy)
-        .set({'id': widget.productDetail.prodPostBy});
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(Constant.userId)
-        .collection('messages')
-        .doc(widget.productDetail.prodPostBy)
-        .collection('chating')
-        .add({
-      'message': 'Hi there!\nI want to Buy this Product',
-      'sendTo': widget.productDetail.prodPostBy,
-      'sendBy': Constant.userId,
-      'time': DateTime.now(),
-    });
-    ////
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(widget.productDetail.prodPostBy)
-        .collection('messages')
-        .doc(Constant.userId)
-        .set({'id': Constant.userId});
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(widget.productDetail.prodPostBy)
-        .collection('messages')
-        .doc(Constant.userId)
-        .collection('chating')
-        .add({
-      'message': 'Hi there!\nI want to Buy this Product',
-      'sendTo': widget.productDetail.prodPostBy,
-      'sendBy': Constant.userId,
-      'time': DateTime.now(),
-    });
-
-    // prod image
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(Constant.userId)
-        .collection('messages')
-        .doc(widget.productDetail.prodPostBy)
-        .set({'id': widget.productDetail.prodPostBy});
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(Constant.userId)
-        .collection('messages')
-        .doc(widget.productDetail.prodPostBy)
-        .collection('chating')
-        .add({
-      'message': widget.productDetail.prodImages[0],
-      'sendTo': widget.productDetail.prodPostBy,
-      'sendBy': Constant.userId,
-      'time': DateTime.now(),
-    });
-    ////
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(widget.productDetail.prodPostBy)
-        .collection('messages')
-        .doc(Constant.userId)
-        .set({'id': Constant.userId});
-    await FirebaseFirestore.instance
-        .collection('Chats')
-        .doc(widget.productDetail.prodPostBy)
-        .collection('messages')
-        .doc(Constant.userId)
-        .collection('chating')
-        .add({
-      'message': widget.productDetail.prodImages[0],
-      'sendTo': widget.productDetail.prodPostBy,
-      'sendBy': Constant.userId,
-      'time': DateTime.now(),
-    });
-    await FirebaseFirestore.instance
-        .collection('Products')
-        .doc(widget.productDetail.prodUid)
+        .collection('BuyerRequests')
+        .doc(reqUid)
         .set({
-      'buyRequests': FieldValue.arrayUnion([Constant.userId])
-    }, SetOptions(merge: true));
+      'reqUid': reqUid,
+      'buyerUid': Constant.userId,
+      'productUid': widget.productDetail.prodUid,
+      'productPrice': widget.productDetail.prodPrice,
+      'productImg': widget.productDetail.prodImages[0],
+      'status': 'pending',
+      'time': DateTime.now(),
+      'productName': widget.productDetail.prodName,
+      'quantity': widget.productDetail.prodQuantity,
+      'buyerName': Constant.userName,
+    });
+    Get.back();
   }
 }

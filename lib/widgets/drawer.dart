@@ -7,6 +7,7 @@ import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/add_product.dart';
 import 'package:lets_exchange/screens/my_chats.dart';
 import 'package:lets_exchange/screens/my_products.dart';
+import 'package:lets_exchange/screens/orders_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   @override
@@ -115,6 +116,30 @@ class CustomDrawer extends StatelessWidget {
                 title: Text('Chat'),
                 leading: Icon(
                   Icons.chat,
+                  color: Constant.btnWidgetColor,
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Get.to(OrderScreen());
+              },
+              child: ListTile(
+                title: Text('Orders'),
+                leading: Icon(
+                  Icons.add_shopping_cart_rounded,
+                  color: Constant.btnWidgetColor,
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                // Get.to(MyChats());
+              },
+              child: ListTile(
+                title: Text('Exchange'),
+                leading: Icon(
+                  Icons.autorenew,
                   color: Constant.btnWidgetColor,
                 ),
               ),

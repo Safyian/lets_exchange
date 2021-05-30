@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/chat_model.dart';
-import 'package:lets_exchange/model/product_model.dart';
 
 class ChatScreen extends StatefulWidget {
   String Name;
@@ -66,6 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Container(
               padding: EdgeInsets.only(bottom: Get.height * 0.08),
               child: ListView.builder(
+                  // reverse: true,
                   itemCount: _chatList.length,
                   itemBuilder: (context, index) {
                     return msgContainer(
@@ -79,20 +79,13 @@ class _ChatScreenState extends State<ChatScreen> {
               alignment: Alignment.bottomCenter,
               child: Container(
                 width: Get.width,
-                // height: Get.height * 0.08,
-                // color: Constant.primary,
                 child: TextFormField(
                   controller: chatController,
                   style: TextStyle(fontSize: Get.width * 0.04),
                   decoration: inputDecoration.copyWith(
-                    // prefixIcon: Icon(
-                    //   Icons.search,
-                    //   color: Constant.btnWidgetColor,
-                    // ),
                     suffixIcon: GestureDetector(
                       onTap: () async {
                         FocusScope.of(context).unfocus();
-
                         await sendMessage();
                         chatController.clear();
                       },
