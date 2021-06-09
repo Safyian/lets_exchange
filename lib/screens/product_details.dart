@@ -1,12 +1,18 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
@@ -27,6 +33,46 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String address;
   String date;
   String duration;
+  File _image;
+  File _cropImage;
+  UploadTask imageUploadTask;
+  TextEditingController exName = TextEditingController();
+  TextEditingController exDetail = TextEditingController();
+  final picker = ImagePicker();
+  PersistentBottomSheetController _controller;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool open = false;
+  final _formKey = GlobalKey<FormState>();
+
+  //************** ImagePicker from Gallery  ************/
+  _imgFromGallery() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50);
+
+    setState(() {
+      _image = image;
+    });
+
+    // ****** Crop Image *****
+    if (_image != null) {
+      _imgCropper();
+    }
+  }
+
+  // ********** Image Cropper *******/
+  _imgCropper() async {
+    File cropped = await ImageCropper.cropImage(
+      sourcePath: _image.path,
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      compressQuality: 10,
+      compressFormat: ImageCompressFormat.png,
+      cropStyle: CropStyle.rectangle,
+    );
+    this.setState(() {
+      _cropImage = cropped;
+    });
+    _controller.setState(() {});
+  }
 
   @override
   void initState() {
@@ -42,6 +88,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
+      key: _scaffoldKey,
       backgroundColor: Constant.background,
       // ********** AppBar ********
       appBar: AppBar(
@@ -311,7 +359,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: ElevatedButton(
                       onPressed: () {
-                        _showDialog(model: widget.productDetail);
+                        _showBuyDialog(model: widget.productDetail);
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Constant.btnWidgetColor,
@@ -331,7 +379,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   SizedBox(width: Get.width * 0.025),
                   // Exchange Button
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _showExchange(context);
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Constant.btnWidgetColor,
                       shape: RoundedRectangleBorder(
@@ -368,8 +418,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
 //
-// user defined function
-  void _showDialog({@required ProductModel model}) {
+// user defined function for Buy Now
+  void _showBuyDialog({@required ProductModel model}) {
     // flutter defined function
     showDialog(
       context: context,
@@ -478,6 +528,134 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
+//
+  Future<void> _showExchange(BuildContext ctx) async {
+    _controller = await _scaffoldKey.currentState.showBottomSheet(
+      (ctx) => Form(
+        key: _formKey,
+        child: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // SizedBox(height: Get.width * 0.02),
+              Container(
+                decoration: BoxDecoration(
+                  color: Constant.btnWidgetColor,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    topLeft: Radius.circular(16),
+                  ),
+                ),
+                height: Get.height * 0.06,
+                child: Center(
+                  child: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.white,
+                    size: Get.width * 0.08,
+                  ),
+                ),
+              ),
+              SizedBox(height: Get.width * 0.02),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Please enter your Product details:",
+                      style: TextStyle(
+                          fontSize: Get.width * 0.04,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: Get.width * 0.04),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          _imgFromGallery();
+                        },
+                        child: Container(
+                          width: Get.width * 0.22,
+                          height: Get.width * 0.2,
+                          decoration: BoxDecoration(
+                              color: Constant.primary,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: _cropImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    _cropImage,
+                                    fit: BoxFit.cover,
+                                  ))
+                              : Icon(
+                                  Icons.image,
+                                  color: Colors.grey,
+                                ),
+                        ),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: exName,
+                      decoration: InputDecoration(hintText: 'Product Name'),
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return 'Please enter Product Name';
+                        } else
+                          return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: exDetail,
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        hintText: 'Description',
+                      ),
+                      validator: (val) {
+                        if (val.isEmpty) {
+                          return 'Please enter Product Details';
+                        } else
+                          return null;
+                      },
+                    ),
+                    SizedBox(height: Get.width * 0.02),
+                    Center(
+                      child: RaisedButton(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                          color: Constant.btnWidgetColor,
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              if (_cropImage != null) {
+                                exchangeNow(
+                                  productName: exName.text.toString(),
+                                  productDetails: exDetail.text.toString(),
+                                  file: _cropImage,
+                                );
+                              } else
+                                Authentication.showError(
+                                    'Empty', 'Please select Product image');
+                            }
+                          },
+                          child: Text(
+                            'Submit',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: Get.width * 0.04),
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: Get.width * 0.02),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+//
+
   // ******* Get Location from Coordinates *******
   locationFromCordinates(Coordinates coordinates) async {
     var addresses =
@@ -543,5 +721,63 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       'buyerName': Constant.userName,
     });
     Get.back();
+  }
+
+  // Exchange method
+  exchangeNow({String productName, String productDetails, File file}) async {
+    String reqUid = DateTime.now().millisecondsSinceEpoch.toString();
+    String image = '';
+    try {
+      Get.defaultDialog(
+        title: 'Please wait',
+        middleText: 'Sending Request...',
+      );
+      //
+      //Create a reference to the location you want to upload to in firebase
+      Reference reference = FirebaseStorage.instance
+          .ref()
+          .child('pictures')
+          .child(DateTime.now().millisecondsSinceEpoch.toString());
+
+      //Upload the file to firebase
+      imageUploadTask = reference.putFile(file);
+
+      // Waits till the file is uploaded then stores the download url
+      await imageUploadTask.whenComplete(() {
+        print('image uploaded');
+      });
+      // getting image url
+      reference.getDownloadURL().then((url) async {
+        image = url.toString();
+        // **********
+        if (image.isNotEmpty) {
+          // ****** Storing User Data ******
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(widget.productDetail.prodPostBy)
+              .collection('ExchangeRequests')
+              .doc(reqUid)
+              .set({
+            'reqUid': reqUid,
+            'buyerUid': Constant.userId,
+            'productUid': widget.productDetail.prodUid,
+            'productPrice': widget.productDetail.prodPrice,
+            'productImg': widget.productDetail.prodImages[0],
+            'status': 'pending',
+            'time': DateTime.now(),
+            'productName': widget.productDetail.prodName,
+            'quantity': widget.productDetail.prodQuantity,
+            'buyerName': Constant.userName,
+            'exchangeProductName': productName,
+            'exchangeProductDetails': productDetails,
+          });
+          Get.back();
+
+          Authentication.showError(
+              'Success', 'Exchange Request Send Successfully');
+          _controller.close();
+        }
+      });
+    } catch (e) {}
   }
 }
