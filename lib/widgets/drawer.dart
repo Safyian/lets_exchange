@@ -5,6 +5,7 @@ import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/add_product.dart';
+import 'package:lets_exchange/screens/exchange_screen.dart';
 import 'package:lets_exchange/screens/my_chats.dart';
 import 'package:lets_exchange/screens/my_products.dart';
 import 'package:lets_exchange/screens/orders_screen.dart';
@@ -134,7 +135,7 @@ class CustomDrawer extends StatelessWidget {
             ),
             InkWell(
               onTap: () {
-                // Get.to(MyChats());
+                Get.to(ExchangeScreen());
               },
               child: ListTile(
                 title: Text('Exchange'),

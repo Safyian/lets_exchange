@@ -770,6 +770,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             'buyerName': Constant.userName,
             'exchangeProductName': productName,
             'exchangeProductDetails': productDetails,
+            'exchangeProductImg': image,
           });
           Get.back();
 
