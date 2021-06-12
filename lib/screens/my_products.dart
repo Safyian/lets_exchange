@@ -9,6 +9,8 @@ import 'package:lets_exchange/screens/add_product.dart';
 import 'package:lets_exchange/widgets/product_card.dart';
 
 class MyProducts extends StatefulWidget {
+  String fromScreen;
+  MyProducts({@required this.fromScreen});
   @override
   _MyProductsState createState() => _MyProductsState();
 }
@@ -26,51 +28,50 @@ class _MyProductsState extends State<MyProducts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width,
-            MediaQuery.of(context).size.height / 10),
-        child: customAppBar(),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // ********** GridView Starts here ********
-            StaggeredGridView.countBuilder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
-              crossAxisSpacing: 6.0,
-              mainAxisSpacing: 6.0,
-              itemCount: _myProduct.length,
-              itemBuilder: (context, index) {
-                print('post by = ${_myProduct[index].prodPostBy}');
-                // ********* Card ********
-                return ProductCard(
-                  prodList: _myProduct[index],
-                  onTap: () {
-                    ProductModel productModel = ProductModel(
-                        prodName: _myProduct[index].prodName,
-                        sellerName: '',
-                        prodUid: _myProduct[index].prodUid,
-                        prodStatus: '',
-                        prodDescription: _myProduct[index].prodDescription,
-                        prodPrice: _myProduct[index].prodPrice,
-                        prodCatagory: _myProduct[index].prodCatagory,
-                        prodImages: _myProduct[index].prodImages,
-                        prodPostBy: '',
-                        prodDate: _myProduct[index].prodDate,
-                        longitude: _myProduct[index].longitude,
-                        latitude: _myProduct[index].latitude,
-                        prodQuantity: _myProduct[index].prodQuantity,
-                        favouriteBy: _myProduct[index].favouriteBy);
-                    Get.to(AddProduct(productModel: productModel));
-                  },
-                  delete: true,
-                );
-              },
-              staggeredTileBuilder: (_) => StaggeredTile.fit(2),
-            ),
-          ],
+      appBar: customAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // ********** GridView Starts here ********
+              StaggeredGridView.countBuilder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 4,
+                crossAxisSpacing: 6.0,
+                mainAxisSpacing: 6.0,
+                itemCount: _myProduct.length,
+                itemBuilder: (context, index) {
+                  print('post by = ${_myProduct[index].prodPostBy}');
+                  // ********* Card ********
+                  return ProductCard(
+                    prodList: _myProduct[index],
+                    onTap: () {
+                      ProductModel productModel = ProductModel(
+                          prodName: _myProduct[index].prodName,
+                          sellerName: '',
+                          prodUid: _myProduct[index].prodUid,
+                          prodStatus: '',
+                          prodDescription: _myProduct[index].prodDescription,
+                          prodPrice: _myProduct[index].prodPrice,
+                          prodCatagory: _myProduct[index].prodCatagory,
+                          prodImages: _myProduct[index].prodImages,
+                          prodPostBy: '',
+                          prodDate: _myProduct[index].prodDate,
+                          longitude: _myProduct[index].longitude,
+                          latitude: _myProduct[index].latitude,
+                          prodQuantity: _myProduct[index].prodQuantity,
+                          favouriteBy: _myProduct[index].favouriteBy);
+                      Get.to(AddProduct(productModel: productModel));
+                    },
+                    delete: widget.fromScreen == 'Bidding' ? false : true,
+                  );
+                },
+                staggeredTileBuilder: (_) => StaggeredTile.fit(2),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -78,7 +79,7 @@ class _MyProductsState extends State<MyProducts> {
 
   AppBar customAppBar() {
     return AppBar(
-      elevation: 0.0,
+      elevation: 2.0,
       leading: Container(),
       flexibleSpace: Container(
         color: Constant.primary,

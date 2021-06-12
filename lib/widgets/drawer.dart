@@ -99,7 +99,9 @@ class CustomDrawer extends StatelessWidget {
             ),
             InkWell(
               onTap: () {
-                Get.to(MyProducts());
+                Get.to(MyProducts(
+                  fromScreen: '',
+                ));
               },
               child: ListTile(
                 title: Text('My Products'),

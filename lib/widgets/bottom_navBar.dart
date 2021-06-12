@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lets_exchange/const/const.dart';
-import 'package:lets_exchange/screens/add_product.dart';
+import 'package:lets_exchange/screens/biding_screen.dart';
 import 'package:lets_exchange/screens/favourite_screen.dart';
 import 'package:lets_exchange/screens/home_screen.dart';
-import 'package:lets_exchange/screens/kitchen_products.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -84,6 +83,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         children: [
           HomeScreen(),
           FavouriteScreen(),
+          BiddingScreen(),
         ],
       ),
     );

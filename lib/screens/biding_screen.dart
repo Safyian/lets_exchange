@@ -7,16 +7,17 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
+import 'package:lets_exchange/screens/my_products.dart';
 import 'package:lets_exchange/screens/product_details.dart';
 
 import 'package:lets_exchange/widgets/product_card.dart';
 
-class FavouriteScreen extends StatefulWidget {
+class BiddingScreen extends StatefulWidget {
   @override
-  _FavouriteScreenState createState() => _FavouriteScreenState();
+  _BiddingScreenState createState() => _BiddingScreenState();
 }
 
-class _FavouriteScreenState extends State<FavouriteScreen> {
+class _BiddingScreenState extends State<BiddingScreen> {
   List<ProductModel> fvrtList = [];
   List<ProductModel> fvrtFilter = [];
   TextEditingController searchController = TextEditingController();
@@ -35,15 +36,59 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Favourite',
+          'Bidding',
           style: GoogleFonts.pacifico(
             fontSize: Get.width * 0.055,
             fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
         ),
-        backgroundColor: Constant.primary,
         elevation: 0.0,
+        leading: Container(),
+        flexibleSpace: Container(
+          color: Constant.primary,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 8,
+                  left: 16,
+                  right: 16,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Spacer(),
+                    // ********* POST Button *********
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(MyProducts(fromScreen: 'Bidding'));
+                      },
+                      child: Container(
+                        width: 65,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.0),
+                          color: Constant.btnColor,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'ADD',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       backgroundColor: Constant.background,
       body: GestureDetector(

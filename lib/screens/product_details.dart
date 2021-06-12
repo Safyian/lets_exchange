@@ -30,6 +30,7 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _current = 0;
   bool favIcon;
+  bool exCheck = false;
   String address;
   String date;
   String duration;
@@ -82,6 +83,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     favIcon = widget.productDetail.favouriteBy.contains(Constant.userId)
         ? true
         : false;
+    checkExchangeReq();
     super.initState();
   }
 
@@ -379,9 +381,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   SizedBox(width: Get.width * 0.025),
                   // Exchange Button
                   ElevatedButton(
-                    onPressed: () {
-                      _showExchange(context);
-                    },
+                    onPressed: exCheck
+                        ? null
+                        : () {
+                            _showExchange(context);
+                          },
                     style: ElevatedButton.styleFrom(
                       primary: Constant.btnWidgetColor,
                       shape: RoundedRectangleBorder(
@@ -780,5 +784,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         }
       });
     } catch (e) {}
+  }
+
+  //check exchange button
+  checkExchangeReq() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('ExchangeRequests')
+        .where('buyerUid', isEqualTo: Constant.userId)
+        .where('productUid', isEqualTo: widget.productDetail.prodUid)
+        .snapshots()
+        .listen((event) {
+      print('event = ${event.docs.isNotEmpty}');
+      exCheck = event.docs.isNotEmpty;
+      setState(() {});
+    });
   }
 }

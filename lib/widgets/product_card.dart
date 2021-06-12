@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -8,9 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
-import 'package:lets_exchange/screens/add_product.dart';
-import 'package:lets_exchange/screens/product_details.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductModel prodList;
@@ -72,10 +68,6 @@ class _ProductCardState extends State<ProductCard> {
                                       title: 'DELETE',
                                       middleText: 'Are you sure?',
                                       actions: [
-                                        // SpinKitFadingCircle(
-                                        //   color: Constant.btnWidgetColor,
-                                        //   size: Get.width * 0.12,
-                                        // ),
                                         ElevatedButton(
                                           onPressed: () async {
                                             await FirebaseFirestore.instance
@@ -121,27 +113,82 @@ class _ProductCardState extends State<ProductCard> {
                                 ),
                               ),
                             )
-                          : Container()
+                          : Align(
+                              alignment: Alignment.topRight,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Get.defaultDialog(
+                                    title: 'Add to Bidding',
+                                    middleText: 'Are you sure?',
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          await FirebaseFirestore.instance
+                                              .collection('Products')
+                                              .doc(widget.prodList.prodUid)
+                                              .delete()
+                                              .then((value) => Get.back());
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            primary: Constant.btnWidgetColor),
+                                        child: Text('YES',
+                                            style: TextStyle(
+                                                fontSize: Get.width * 0.04,
+                                                fontWeight: FontWeight.w600)),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Get.back();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            primary: Constant.btnWidgetColor),
+                                        child: Text('NO',
+                                            style: TextStyle(
+                                                fontSize: Get.width * 0.04,
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                    ],
+                                  );
+                                },
+                                child: Container(
+                                  width: Get.width * 0.12,
+                                  height: Get.width * 0.12,
+                                  decoration: BoxDecoration(
+                                      // color: Colors.black,
+                                      color: Constant.btnWidgetColor,
+                                      borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(12))),
+                                  child: Icon(
+                                    Icons.addchart_rounded,
+                                    color: Colors.white,
+                                    size: Get.width * 0.055,
+                                  ),
+                                ),
+                              ),
+                            )
                       : Align(
                           alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  tagFavourite = !tagFavourite;
-                                });
-                                addtoFavourite(uid: widget.prodList.prodUid);
-                              },
-                              child: Container(
-                                child: Icon(
-                                  tagFavourite
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color:
-                                      tagFavourite ? Colors.red : Colors.white,
-                                  size: Get.width * 0.08,
-                                ),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                tagFavourite = !tagFavourite;
+                              });
+                              addtoFavourite(uid: widget.prodList.prodUid);
+                            },
+                            child: Container(
+                              width: Get.width * 0.1,
+                              height: Get.width * 0.1,
+                              decoration: BoxDecoration(
+                                  // color: Colors.black,
+                                  color: Constant.btnWidgetColor,
+                                  borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(12))),
+                              child: Icon(
+                                tagFavourite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: tagFavourite ? Colors.red : Colors.white,
+                                size: Get.width * 0.06,
                               ),
                             ),
                           ),

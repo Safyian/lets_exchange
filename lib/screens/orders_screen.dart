@@ -166,6 +166,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                       ? null
                                       : () {
                                           // Get.back();
+                                          cancelRequest(
+                                              reqUid: _myOrders[index].reqUid);
                                         },
                                   style: ElevatedButton.styleFrom(
                                     primary: Constant.btnWidgetColor,
@@ -225,6 +227,7 @@ class _OrderScreenState extends State<OrderScreen> {
         .collection('users')
         .doc(Constant.userId)
         .collection('BuyerRequests')
+        .where('status', isNotEqualTo: 'cancel')
         .snapshots()
         .listen((event) {
       if (event.docs != null) {
@@ -259,5 +262,15 @@ class _OrderScreenState extends State<OrderScreen> {
           .doc(prodUid)
           .update({'prodStatus': 'sold', 'prodQuantity': 0});
     }
+  }
+
+  // cancel request
+  cancelRequest({@required String reqUid}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(Constant.userId)
+        .collection('BuyerRequests')
+        .doc(reqUid)
+        .update({'status': 'cancel'});
   }
 }
