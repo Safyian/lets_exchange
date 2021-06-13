@@ -290,7 +290,7 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
         .collection('users')
         .doc(Constant.userId)
         .collection('ExchangeRequests')
-        .where('status', isEqualTo: 'pending')
+        .where('status', isNotEqualTo: 'cancel')
         .snapshots()
         .listen((event) {
       if (event.docs != null) {
@@ -326,6 +326,26 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
           .doc(prodUid)
           .update({'prodStatus': 'sold', 'prodQuantity': 0});
     }
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(Constant.userId)
+        .collection('ExchangeRequests')
+        .where('productUid', isEqualTo: prodUid)
+        .where('reqUid', isNotEqualTo: reqUid)
+        .snapshots()
+        .listen((event) {
+      event.docs.forEach((value) async {
+        print('value === ${value.id}');
+        if (quantity == 1) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(Constant.userId)
+              .collection('ExchangeRequests')
+              .doc(value.id)
+              .update({'status': 'cancel'});
+        }
+      });
+    });
   }
 
   // cancel deal

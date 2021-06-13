@@ -35,6 +35,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     bool isSearching = searchController.text.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Bidding',
           style: GoogleFonts.pacifico(

@@ -34,6 +34,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
     bool isSearching = searchController.text.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Favourite',
           style: GoogleFonts.pacifico(
