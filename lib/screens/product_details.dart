@@ -16,9 +16,7 @@ import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
-import 'package:lets_exchange/screens/add_product.dart';
 import 'package:lets_exchange/screens/chat_screen.dart';
-import 'package:lets_exchange/screens/my_chats.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel productDetail;

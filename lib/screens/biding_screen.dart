@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
+import 'package:lets_exchange/screens/BiddingItemScreen.dart';
+import 'package:lets_exchange/screens/bid_itemCard.dart';
 import 'package:lets_exchange/screens/my_products.dart';
 import 'package:lets_exchange/screens/product_details.dart';
 
@@ -18,12 +20,12 @@ class BiddingScreen extends StatefulWidget {
 }
 
 class _BiddingScreenState extends State<BiddingScreen> {
-  List<ProductModel> fvrtList = [];
-  List<ProductModel> fvrtFilter = [];
+  List<ProductModel> bidsList = [];
+  List<ProductModel> bidsFilter = [];
   TextEditingController searchController = TextEditingController();
   @override
   void initState() {
-    getFvrtProducts();
+    getbiddingProducts();
     super.initState();
     searchController.addListener(() {
       filterList();
@@ -141,7 +143,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
                   height: Get.height * 0.01,
                 ),
                 // ********** GridView Starts here ********
-                fvrtList.length == 0
+                bidsList.length == 0
                     ? Container(
                         height: Get.height * 0.5,
                         alignment: Alignment.center,
@@ -161,20 +163,20 @@ class _BiddingScreenState extends State<BiddingScreen> {
                         crossAxisSpacing: 6.0,
                         mainAxisSpacing: 6.0,
                         itemCount: isSearching == true
-                            ? fvrtFilter.length
-                            : fvrtList.length,
+                            ? bidsFilter.length
+                            : bidsList.length,
                         itemBuilder: (context, index) {
                           ProductModel prodModel = isSearching == true
-                              ? fvrtFilter[index]
-                              : fvrtList[index];
+                              ? bidsFilter[index]
+                              : bidsList[index];
                           // ********* Card ********
-                          return ProductCard(
+                          return BidCard(
                             prodList: prodModel,
                             onTap: () {
-                              Get.to(ProductDetailsScreen(
-                                  productDetail: prodModel));
+                              Get.to(
+                                  BiddingItemScreen(productDetail: prodModel));
                             },
-                            delete: false,
+                            delete: true,
                           );
                         },
                         staggeredTileBuilder: (_) => StaggeredTile.fit(2),
@@ -189,40 +191,24 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
   // ************** Favourite Item List **********
   //
-  getFvrtProducts() async {
+  getbiddingProducts() async {
     FirebaseFirestore.instance
-        .collection('users')
-        .doc(Constant.userId)
-        .collection('favourites')
+        .collection('Products')
+        .where('prodStatus', isEqualTo: 'bidding')
         .snapshots()
         .listen((event) {
-      if (event.docs != null) {
-        fvrtList.clear();
-        event.docs.forEach((element) async {
-          FirebaseFirestore.instance
-              .collection('Products')
-              .doc(element.id)
-              //     .snapshots()
-              //     .listen((event) async {
-              //   print('bbb = $event');
-              //   await fvrtList.add(ProductModel.fromMap(event.data()));
-              //   setState(() {});
-              // });
-              .get()
-              .then((value) {
-            fvrtList.add(ProductModel.fromMap(value.data()));
-            setState(() {});
-          });
-        });
-        setState(() {});
-      }
+      bidsList.clear();
+      event.docs.forEach((element) {
+        bidsList.add(ProductModel.fromMap(element.data()));
+      });
+      setState(() {});
     });
   }
 
   //
   filterList() {
     List<ProductModel> _product = [];
-    _product.addAll(fvrtList);
+    _product.addAll(bidsList);
     if (searchController.text.isNotEmpty) {
       _product.retainWhere((element) {
         String searchTerm = searchController.text.toLowerCase();
@@ -231,7 +217,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
       });
 
       setState(() {
-        fvrtFilter = _product;
+        bidsFilter = _product;
       });
     } else {
       setState(() {

@@ -5,7 +5,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/const/const.dart';
-import 'package:lets_exchange/screens/home_screen.dart';
 import 'package:lets_exchange/screens/login.dart';
 import 'package:lets_exchange/widgets/bottom_navBar.dart';
 

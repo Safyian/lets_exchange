@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,20 +7,27 @@ import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
 
-class ProductCard extends StatefulWidget {
+class BidCard extends StatefulWidget {
   final ProductModel prodList;
   final Function onTap;
   final bool delete;
 
-  ProductCard(
+  BidCard(
       {@required this.prodList, @required this.onTap, @required this.delete});
 
   @override
-  _ProductCardState createState() => _ProductCardState();
+  _BidCardState createState() => _BidCardState();
 }
 
-class _ProductCardState extends State<ProductCard> {
+class _BidCardState extends State<BidCard> {
   bool tagFavourite;
+  List bidInfoList = [];
+
+  @override
+  void initState() {
+    biddingInfo();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +71,7 @@ class _ProductCardState extends State<ProductCard> {
                                 child: GestureDetector(
                                   onTap: () {
                                     Get.defaultDialog(
-                                      title: 'DELETE',
+                                      title: 'Remove from Bidding',
                                       middleText: 'Are you sure?',
                                       actions: [
                                         ElevatedButton(
@@ -101,9 +107,9 @@ class _ProductCardState extends State<ProductCard> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     child: Icon(
-                                      Icons.delete,
+                                      Icons.remove_circle,
                                       // color: Colors.red,
-                                      size: Get.width * 0.055,
+                                      size: Get.width * 0.05,
                                     ),
                                   ),
                                 ),
@@ -118,9 +124,13 @@ class _ProductCardState extends State<ProductCard> {
                                     middleText: 'Are you sure?',
                                     actions: [
                                       ElevatedButton(
-                                        onPressed: () {
-                                          addToBidding(
-                                              prodUid: widget.prodList.prodUid);
+                                        onPressed: () async {
+                                          await FirebaseFirestore.instance
+                                              .collection('Products')
+                                              .doc(widget.prodList.prodUid)
+                                              .update({
+                                            'prodStatus': 'bidding'
+                                          }).then((value) => Get.back());
                                         },
                                         style: ElevatedButton.styleFrom(
                                             primary: Constant.btnWidgetColor),
@@ -159,33 +169,7 @@ class _ProductCardState extends State<ProductCard> {
                                 ),
                               ),
                             )
-                      : Align(
-                          alignment: Alignment.topRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                tagFavourite = !tagFavourite;
-                              });
-                              addtoFavourite(uid: widget.prodList.prodUid);
-                            },
-                            child: Container(
-                              width: Get.width * 0.1,
-                              height: Get.width * 0.1,
-                              decoration: BoxDecoration(
-                                  // color: Colors.black,
-                                  color: Constant.btnWidgetColor,
-                                  borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(12))),
-                              child: Icon(
-                                tagFavourite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: tagFavourite ? Colors.red : Colors.white,
-                                size: Get.width * 0.06,
-                              ),
-                            ),
-                          ),
-                        )
+                      : SizedBox(),
                 ],
               ),
             ),
@@ -219,23 +203,17 @@ class _ProductCardState extends State<ProductCard> {
             SizedBox(
               height: Get.height * 0.01,
             ),
+            // Total Bids Text
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
-              child: RatingBar.builder(
-                initialRating: 3.5,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                itemPadding: EdgeInsets.symmetric(horizontal: 0.5),
-                itemSize: Get.width * 0.04,
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {
-                  print(rating);
-                },
+              child: Text(
+                bidInfoList.length == null
+                    ? 'Total Bids: 0 Bid'
+                    : 'Total Bids: ${bidInfoList.length}',
+                style: GoogleFonts.roboto(
+                    color: Colors.orange[800],
+                    fontWeight: FontWeight.bold,
+                    fontSize: Get.width * 0.035),
               ),
             ),
             SizedBox(
@@ -246,56 +224,44 @@ class _ProductCardState extends State<ProductCard> {
       ),
     );
   }
+  // geting total bids amount
 
-  addtoFavourite({@required String uid}) async {
-    if (tagFavourite == true) {
-      await FirebaseFirestore.instance.collection('Products').doc(uid).set({
-        'favouriteBy': FieldValue.arrayUnion([Constant.userId])
-      }, SetOptions(merge: true));
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(Constant.userId)
-          .collection('favourites')
-          .doc(uid)
-          .set({'prodUid': uid}, SetOptions(merge: true));
-    } else if (tagFavourite == false) {
-      await FirebaseFirestore.instance.collection('Products').doc(uid).update(
-        {
-          'favouriteBy': FieldValue.arrayRemove([Constant.userId])
-        },
-      );
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(Constant.userId)
-          .collection('favourites')
-          .doc(uid)
-          .delete();
-    }
-  }
-
-// Add to bid method
-  Future<void> addToBidding({String prodUid}) async {
-    // await FirebaseFirestore.instance
-    //     .collection('Biddings')
-    //     .doc(prodUid)
-    //     .set({'totalBids': 0, 'prodUid': prodUid});
-    await FirebaseFirestore.instance
-        .collection('Products')
-        .doc(prodUid)
-        .collection('Biddings')
-        .doc()
-        .set({});
+  Future<void> biddingInfo() async {
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)
-        .update({'prodStatus': 'bidding'}).then((value) => Get.back());
+        .collection('Biddings')
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .listen((event) {
+      bidInfoList.clear();
+      event.docs.forEach((element) {
+        bidInfoList.add(element.data());
+      });
+      setState(() {});
+      print('info ==== ${bidInfoList.length}');
+    });
   }
 
   Future<void> removeFromBidding() async {
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)
-        .delete()
-        .then((value) => Get.back());
+        .update({'prodStatus': 'pending'}).then((value) => Get.back());
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.prodList.prodUid)
+        .collection('Biddings')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) async {
+        await FirebaseFirestore.instance
+            .collection('Products')
+            .doc(widget.prodList.prodUid)
+            .collection('Biddings')
+            .doc(element.id)
+            .delete();
+      });
+    });
   }
 }
