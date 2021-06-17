@@ -231,7 +231,7 @@ class _BidCardState extends State<BidCard> {
         .collection('Products')
         .doc(widget.prodList.prodUid)
         .collection('Biddings')
-        .where('status', isEqualTo: 'pending')
+        .where('status', isEqualTo: 'active')
         .snapshots()
         .listen((event) {
       bidInfoList.clear();

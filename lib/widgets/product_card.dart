@@ -284,7 +284,7 @@ class _ProductCardState extends State<ProductCard> {
         .doc(prodUid)
         .collection('Biddings')
         .doc()
-        .set({});
+        .set({'status': 'pending'});
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)

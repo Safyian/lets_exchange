@@ -7,18 +7,17 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:lets_exchange/auth_helper/authentication.dart';
 import 'package:lets_exchange/auth_helper/services.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/product_model.dart';
-import 'package:lets_exchange/screens/chat_screen.dart';
 
 class BiddingItemScreen extends StatefulWidget {
   final ProductModel productDetail;
+
   BiddingItemScreen({@required this.productDetail});
+
   @override
   _BiddingItemScreenState createState() => _BiddingItemScreenState();
 }
@@ -30,16 +29,17 @@ class _BiddingItemScreenState extends State<BiddingItemScreen> {
   String address;
   String date;
   String duration;
-  File _image;
-  File _cropImage;
+
   UploadTask imageUploadTask;
   TextEditingController exName = TextEditingController();
   TextEditingController exDetail = TextEditingController();
   final picker = ImagePicker();
-  PersistentBottomSheetController _controller;
+  final _controller = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool open = false;
   final _formKey = GlobalKey<FormState>();
+  List bidsList = [];
+  List winner = [];
 
   @override
   void initState() {
@@ -49,12 +49,13 @@ class _BiddingItemScreenState extends State<BiddingItemScreen> {
     favIcon = widget.productDetail.favouriteBy.contains(Constant.userId)
         ? true
         : false;
-
+    fetchBids();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // bidsList.sort((a, b) => b['bidPrice'].compareTo(a['bidPrice']));
     return Scaffold(
       resizeToAvoidBottomInset: true,
       key: _scaffoldKey,
@@ -93,287 +94,587 @@ class _BiddingItemScreenState extends State<BiddingItemScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-        child: Container(
-          width: Get.width,
-          height: Get.height,
-          color: Constant.background,
-          child: Stack(
-            children: [
-              Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      body:
+      // winner.isNotEmpty
+      //     ? Column(
+      //         children: [
+      //           Container(
+      //             child: SingleChildScrollView(
+      //               child: Column(
+      //                 crossAxisAlignment: CrossAxisAlignment.start,
+      //                 children: [
+      //                   // ******* Prod Images Carousel Slider *******
+      //                   Container(
+      //                     child: CarouselSlider(
+      //                       items: widget.productDetail.prodImages
+      //                           .map((item) => Container(
+      //                                 child: Center(
+      //                                   child: Stack(
+      //                                     children: <Widget>[
+      //                                       SpinKitPulse(
+      //                                         color: Constant.btnWidgetColor,
+      //                                         size: 65,
+      //                                       ),
+      //                                       Center(
+      //                                         child: Image.network(
+      //                                           item,
+      //                                           fit: BoxFit.cover,
+      //                                         ),
+      //                                       ),
+      //                                     ],
+      //                                   ),
+      //                                 ),
+      //                               ))
+      //                           .toList(),
+      //                       options: CarouselOptions(
+      //                           autoPlay: false,
+      //                           viewportFraction: 1.0,
+      //                           enlargeCenterPage: false,
+      //                           enableInfiniteScroll: false,
+      //                           height: Get.height * 0.3,
+      //                           onPageChanged: (index, reason) {
+      //                             setState(() {
+      //                               _current = index;
+      //                             });
+      //                           }),
+      //                     ),
+      //                   ),
+      //                   // ******** Indicator Dots ********
+      //                   Row(
+      //                     mainAxisAlignment: MainAxisAlignment.center,
+      //                     children: widget.productDetail.prodImages.map((url) {
+      //                       int index =
+      //                           widget.productDetail.prodImages.indexOf(url);
+      //                       return Container(
+      //                         width: 8.0,
+      //                         height: 8.0,
+      //                         margin: EdgeInsets.symmetric(
+      //                             vertical: 10.0, horizontal: 2.0),
+      //                         decoration: BoxDecoration(
+      //                           shape: BoxShape.circle,
+      //                           color: _current == index
+      //                               ? Constant.btnWidgetColor
+      //                               : Colors.grey[400],
+      //                         ),
+      //                       );
+      //                     }).toList(),
+      //                   ),
+      //                   SizedBox(height: Get.height * 0.01),
+      //
+      //                   // ********** Bid Start Price ********
+      //                   Padding(
+      //                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      //                     child: Row(
+      //                       crossAxisAlignment: CrossAxisAlignment.start,
+      //                       children: [
+      //                         Text(
+      //                           'Start at Rs. ${widget.productDetail.prodPrice.toInt()}',
+      //                           style: TextStyle(
+      //                             fontSize: Get.width * 0.04,
+      //                             color: Colors.red,
+      //                             fontWeight: FontWeight.w600,
+      //                           ),
+      //                         ),
+      //                         Spacer(),
+      //                         Column(
+      //                           crossAxisAlignment: CrossAxisAlignment.start,
+      //                           children: [
+      //                             Text(
+      //                               'Win at: Rs. ${winner[0]['bidPrice']}',
+      //                               style: TextStyle(
+      //                                 fontSize: Get.width * 0.042,
+      //                                 color: Colors.black,
+      //                                 fontWeight: FontWeight.bold,
+      //                               ),
+      //                             ),
+      //                             Text(
+      //                               'Winner: ${winner[0]['bidBy']}',
+      //                               style: TextStyle(
+      //                                 fontSize: Get.width * 0.042,
+      //                                 color: Colors.black,
+      //                                 fontWeight: FontWeight.bold,
+      //                               ),
+      //                             ),
+      //                           ],
+      //                         ),
+      //                       ],
+      //                     ),
+      //                   ),
+      //                   // winner card
+      //                   Container(
+      //                     padding: widget.productDetail.prodPostBy ==
+      //                         Constant.userId
+      //                         ? EdgeInsets.only(
+      //                         bottom: Get.height * 0.025)
+      //                         : EdgeInsets.only(
+      //                         bottom: Get.height * 0.04),
+      //                     height: Get.height * 0.47,
+      //                     child: ListView.builder(
+      //                       // shrinkWrap: true,
+      //                       // physics: NeverScrollableScrollPhysics(),
+      //                         itemCount: winner.length,
+      //                         itemBuilder: (_, index) {
+      //                           int position = index + 1;
+      //                           return Padding(
+      //                             padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+      //                             child: Container(
+      //                               child: Card(
+      //                                 child: Padding(
+      //                                   padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
+      //                                   child: Column(
+      //                                     crossAxisAlignment: CrossAxisAlignment.end,
+      //                                     children: [
+      //                                       Row(
+      //                                         children: [
+      //                                           Text(
+      //                                             Constant.userName == bidsList[index]['bidBy']
+      //                                                 ? 'YOU'
+      //                                                 : 'By: ${bidsList[index]['bidBy']}',
+      //                                             style: TextStyle(
+      //                                               fontSize: Get.width * 0.042,
+      //                                               color: Constant.userName == bidsList[index]['bidBy']
+      //                                                   ? Colors.red
+      //                                                   : Colors.black,
+      //                                               fontWeight: FontWeight.bold,
+      //                                             ),
+      //                                           ),
+      //                                           // SizedBox(width: Get.width * 0.01),
+      //                                           Spacer(),
+      //                                           CircleAvatar(
+      //                                             radius: Get.width * 0.032,
+      //                                             backgroundColor: Constant.btnWidgetColor,
+      //                                             child: Text(
+      //                                               '$position',
+      //                                               style: TextStyle(
+      //                                                 fontSize: Get.width * 0.038,
+      //                                                 color: Colors.white,
+      //                                                 fontWeight: FontWeight.bold,
+      //                                               ),
+      //                                             ),
+      //                                           ),
+      //                                         ],
+      //                                       ),
+      //                                       SizedBox(height: Get.width * 0.02),
+      //                                       Row(
+      //                                         children: [
+      //                                           Text(
+      //                                             'Rs. ${bidsList[index]['bidPrice']}',
+      //                                             style: TextStyle(
+      //                                               fontSize: Get.width * 0.042,
+      //                                               color: Colors.black,
+      //                                               fontWeight: FontWeight.bold,
+      //                                             ),
+      //                                           ),
+      //                                           Spacer(),
+      //                                           ElevatedButton(
+      //                                             onPressed:
+      //                                            null,
+      //                                             style: ElevatedButton.styleFrom(
+      //                                                 primary: Constant.btnWidgetColor),
+      //                                             child: Text('ACCEPT',
+      //                                                 style: TextStyle(
+      //                                                     fontSize: Get.width * 0.036,
+      //                                                     fontWeight: FontWeight.w600)),
+      //                                           ),
+      //                                           SizedBox(width: Get.width * 0.01),
+      //                                           ElevatedButton(
+      //                                             onPressed: () {
+      //                                               // Get.back();
+      //                                             },
+      //                                             style: ElevatedButton.styleFrom(
+      //                                                 primary: Constant.btnWidgetColor),
+      //                                             child: Text('CHAT',
+      //                                                 style: TextStyle(
+      //                                                     fontSize: Get.width * 0.036,
+      //                                                     fontWeight: FontWeight.w600)),
+      //                                           ),
+      //                                         ],
+      //                                       )
+      //                                     ],
+      //                                   ),
+      //                                 ),
+      //                               ),
+      //                             ),
+      //                           );
+      //                         }),
+      //                   ),
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //         ],
+      //       )
+      //     :
+      Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+                child: Container(
+                  width: Get.width,
+                  height: Get.height,
+                  color: Constant.background,
+                  child: Stack(
                     children: [
-                      // ******* Prod Images Carousel Slider *******
                       Container(
-                        child: CarouselSlider(
-                          items: widget.productDetail.prodImages
-                              .map((item) => Container(
-                                    child: Center(
-                                      child: Stack(
-                                        children: <Widget>[
-                                          SpinKitPulse(
-                                            color: Constant.btnWidgetColor,
-                                            size: 65,
-                                          ),
-                                          Center(
-                                            child: Image.network(
-                                              item,
-                                              fit: BoxFit.cover,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ******* Prod Images Carousel Slider *******
+                              Container(
+                                child: CarouselSlider(
+                                  items: widget.productDetail.prodImages
+                                      .map((item) => Container(
+                                            child: Center(
+                                              child: Stack(
+                                                children: <Widget>[
+                                                  SpinKitPulse(
+                                                    color:
+                                                        Constant.btnWidgetColor,
+                                                    size: 65,
+                                                  ),
+                                                  Center(
+                                                    child: Image.network(
+                                                      item,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                          ))
+                                      .toList(),
+                                  options: CarouselOptions(
+                                      autoPlay: false,
+                                      viewportFraction: 1.0,
+                                      enlargeCenterPage: false,
+                                      enableInfiniteScroll: false,
+                                      height: Get.height * 0.3,
+                                      onPageChanged: (index, reason) {
+                                        setState(() {
+                                          _current = index;
+                                        });
+                                      }),
+                                ),
+                              ),
+                              // ******** Indicator Dots ********
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children:
+                                    widget.productDetail.prodImages.map((url) {
+                                  int index = widget.productDetail.prodImages
+                                      .indexOf(url);
+                                  return Container(
+                                    width: 8.0,
+                                    height: 8.0,
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10.0, horizontal: 2.0),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: _current == index
+                                          ? Constant.btnWidgetColor
+                                          : Colors.grey[400],
                                     ),
-                                  ))
-                              .toList(),
-                          options: CarouselOptions(
-                              autoPlay: false,
-                              viewportFraction: 1.0,
-                              enlargeCenterPage: false,
-                              enableInfiniteScroll: false,
-                              height: Get.height * 0.3,
-                              onPageChanged: (index, reason) {
-                                setState(() {
-                                  _current = index;
-                                });
-                              }),
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(height: Get.height * 0.01),
+
+                              // ********** Bid Start Price ********
+                               Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Start at Rs. ${widget.productDetail.prodPrice.toInt()}',
+                                          style: TextStyle(
+                                            fontSize: Get.width * 0.04,
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              bidsList.isEmpty
+                                                  ? ''
+                                                  : 'Max Rs. ${bidsList.first['bidPrice']}',
+                                              style: TextStyle(
+                                                fontSize: Get.width * 0.042,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              bidsList.isEmpty ? '':
+                                              'Bid By: ${bidsList.first['bidBy']}',
+                                              style: TextStyle(
+                                                fontSize: Get.width * 0.042,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                              // Bidding Live List
+                            ],
+                          ),
                         ),
                       ),
-                      // ******** Indicator Dots ********
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: widget.productDetail.prodImages.map((url) {
-                          int index =
-                              widget.productDetail.prodImages.indexOf(url);
-                          return Container(
-                            width: 8.0,
-                            height: 8.0,
-                            margin: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 2.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _current == index
-                                  ? Constant.btnWidgetColor
-                                  : Colors.grey[400],
+
+                      // bids List
+                      Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                padding: widget.productDetail.prodPostBy ==
+                                        Constant.userId
+                                    ? EdgeInsets.only(
+                                        bottom: Get.height * 0.025)
+                                    : EdgeInsets.only(
+                                        bottom: Get.height * 0.04),
+                                height: Get.height * 0.47,
+                                child: ListView.builder(
+                                    // shrinkWrap: true,
+                                    // physics: NeverScrollableScrollPhysics(),
+                                    itemCount: bidsList.length,
+                                    itemBuilder: (_, index) {
+                                      int position = index + 1;
+                                      return bidCard(index, position);
+                                    }),
+                              ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(
-                        height: Get.height * 0.01,
-                      ),
 
-                      // ********** Product Price ********
-                      // Container(
-                      //   width: Get.width,
-                      //   child: Card(
-                      //     elevation: 1.0,
-                      //     shape: RoundedRectangleBorder(
-                      //       borderRadius: BorderRadius.circular(8.0),
-                      //     ),
-                      //     child: Padding(
-                      //       padding: const EdgeInsets.all(8.0),
-                      //       child: Column(
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         children: [
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ),
-                      //           Center(
-                      //             child: Text(
-                      //               'Bidding',
-                      //               style: GoogleFonts.roboto(
-                      //                   fontSize: Get.width * 0.05,
-                      //                   fontWeight: FontWeight.w500,
-                      //                   color: Colors.black),
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ), //
-                      //           Text(
-                      //             '${Services().formateMoney(widget.productDetail.prodPrice)}',
-                      //             style: GoogleFonts.roboto(
-                      //                 fontSize: Get.width * 0.05,
-                      //                 fontWeight: FontWeight.w500,
-                      //                 color: Colors.red),
-                      //           ),
-                      //           // ),
-                      //           // ********* Prod Name *********
-                      //           Text(
-                      //             widget.productDetail.prodName,
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.045,
-                      //               fontWeight: FontWeight.w500,
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ), // ********* Prod Description *********
-                      //           Text(
-                      //             'Description:',
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.042,
-                      //             ),
-                      //           ),
-                      //           Text(
-                      //             widget.productDetail.prodDescription,
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.038,
-                      //               color: Colors.grey[600],
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ), // ********* Prod Description *********
-                      //           Row(
-                      //             children: [
-                      //               Text(
-                      //                 'Stock Availiable:',
-                      //                 style: GoogleFonts.roboto(
-                      //                   fontSize: Get.width * 0.042,
-                      //                 ),
-                      //               ),
-                      //               SizedBox(
-                      //                 width: 8.0,
-                      //               ),
-                      //               Text(
-                      //                 "${widget.productDetail.prodQuantity}",
-                      //                 style: GoogleFonts.roboto(
-                      //                   fontSize: Get.width * 0.042,
-                      //                   // color: Colors.grey[600],
-                      //                 ),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ),
-                      //           // ****** Location of Product ******
-                      //           Text(
-                      //             'Location:',
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.042,
-                      //             ),
-                      //           ),
-                      //           Text(
-                      //             address ?? '',
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.038,
-                      //               color: Colors.grey[600],
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ),
-
-                      //           // ********* Prod Posted Date ******
-                      //           Text(
-                      //             'Posted Date:',
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.042,
-                      //             ),
-                      //           ),
-                      //           Text(
-                      //             duration,
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.038,
-                      //               color: Colors.grey[600],
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ),
-                      //           // ********* Prod Seller Name ******
-                      //           Text(
-                      //             'Seller Name:',
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.042,
-                      //             ),
-                      //           ),
-                      //           Text(
-                      //             widget.productDetail.sellerName,
-                      //             style: GoogleFonts.roboto(
-                      //               fontSize: Get.width * 0.038,
-                      //               color: Colors.grey[600],
-                      //             ),
-                      //           ),
-                      //           SizedBox(
-                      //             height: Get.height * 0.01,
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      // Bottom Buttons
+                      // Type message textfield
+                      widget.productDetail.prodPostBy == Constant.userId
+                          ? SizedBox()
+                          : Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                width: Get.width,
+                                child: TextFormField(
+                                  controller: _controller,
+                                  style: TextStyle(fontSize: Get.width * 0.04),
+                                  decoration: inputDecoration.copyWith(
+                                    suffixIcon: GestureDetector(
+                                      onTap: () async {
+                                        FocusScope.of(context).unfocus();
+                                        if (_formKey.currentState.validate()) {
+                                          await bidOnItem(_controller.text);
+                                        }
+                                        _controller.clear();
+                                      },
+                                      child: Icon(
+                                        Icons.send,
+                                        color: Constant.btnWidgetColor,
+                                      ),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(16.0),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey[200])),
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(16.0),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey[200])),
+                                    hintText: 'Quote your Bid',
+                                  ),
+                                  maxLines: null,
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ),
                     ],
                   ),
                 ),
               ),
-              // Type message textfield
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  width: Get.width,
-                  child: TextFormField(
-                    // controller: chatController,
-                    style: TextStyle(fontSize: Get.width * 0.04),
-                    decoration: inputDecoration.copyWith(
-                      suffixIcon: GestureDetector(
-                        onTap: () async {
-                          FocusScope.of(context).unfocus();
-                          // await sendMessage();
-                          // chatController.clear();
-                        },
-                        child: Icon(
-                          Icons.send,
-                          color: Constant.btnWidgetColor,
+            ),
+    );
+  }
+ // bid card
+  Padding bidCard(int index, int position) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+      child: Container(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      Constant.userName == bidsList[index]['bidBy']
+                          ? 'YOU'
+                          : 'By: ${bidsList[index]['bidBy']}',
+                      style: TextStyle(
+                        fontSize: Get.width * 0.042,
+                        color: Constant.userName == bidsList[index]['bidBy']
+                            ? Colors.red
+                            : Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    // SizedBox(width: Get.width * 0.01),
+                    Spacer(),
+                    CircleAvatar(
+                      radius: Get.width * 0.032,
+                      backgroundColor: Constant.btnWidgetColor,
+                      child: Text(
+                        '$position',
+                        style: TextStyle(
+                          fontSize: Get.width * 0.038,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                          borderSide: BorderSide(color: Colors.grey[200])),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                          borderSide: BorderSide(color: Colors.grey[200])),
-                      hintText: 'Quote your Bid',
                     ),
-                    maxLines: null,
-                    keyboardType: TextInputType.number,
-                  ),
+                  ],
                 ),
-              ),
-            ],
+                SizedBox(height: Get.width * 0.02),
+                Row(
+                  children: [
+                    Text(
+                      'Rs. ${bidsList[index]['bidPrice']}',
+                      style: TextStyle(
+                        fontSize: Get.width * 0.042,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Spacer(),
+                    ElevatedButton(
+                      onPressed:
+                          widget.productDetail.prodPostBy != Constant.userId
+                              ? null
+                              : ()  {
+                                  // fetchWinner(uid: bidsList[index]['bidId']);
+                                    acceptBid(uid:bidsList[index]['bidId']);
+                                },
+                      style: ElevatedButton.styleFrom(
+                          primary: Constant.btnWidgetColor),
+                      child: Text('ACCEPT',
+                          style: TextStyle(
+                              fontSize: Get.width * 0.036,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                    SizedBox(width: Get.width * 0.01),
+                    ElevatedButton(
+                      onPressed: bidsList[index]['status'] == 'active'
+                          ? null
+                          : () {
+                              // Get.back();
+                            },
+                      style: ElevatedButton.styleFrom(
+                          primary: Constant.btnWidgetColor),
+                      child: Text('CHAT',
+                          style: TextStyle(
+                              fontSize: Get.width * 0.036,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
-      // Bottom Section with Floating Chat Button
-      //
-      // ********* Chat Floating Button *******
-      // floatingActionButton: widget.productDetail.prodPostBy == Constant.userId
-      //     ? SizedBox()
-      //     : FloatingActionButton(
-      //         backgroundColor: Constant.btnWidgetColor,
-      //         onPressed: () {
-      //           Get.to(ChatScreen(
-      //             Name: widget.productDetail.sellerName,
-      //             uid: widget.productDetail.prodPostBy,
-      //           ));
-      //         },
-      //         elevation: 14,
-      //         child: Icon(Icons.chat, size: Get.width * 0.055),
-      //       ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 
-//
+// Bid on item method
+  bidOnItem(String bidPrice) async {
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.productDetail.prodUid)
+        .collection('Biddings')
+        .doc(Constant.userId)
+        .set({
+      'bidBy': Constant.userName,
+      'bidId': Constant.userId,
+      'bidPrice': bidPrice,
+      'status': 'active',
+      'bidStatus': 'pending',
+      'isWinner': 'false',
+    }, SetOptions(merge: true));
+  }
+
+// accept bid method
+  acceptBid({String uid}) async {
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.productDetail.prodUid)
+        .collection('Biddings')
+        .doc(uid)
+        .update({'isWinner': 'true'});
+
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.productDetail.prodUid)
+        .collection('Biddings')
+        .where('bidId',isNotEqualTo: uid)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) async {
+          await FirebaseFirestore.instance
+              .collection('Products')
+              .doc(widget.productDetail.prodUid)
+              .collection('Biddings')
+              .doc(element.id)
+              .update({'bidStatus': 'cancel'});
+
+      });
+    });
+  }
+
+  // winner
+  // fetchWinner({String uid}) {
+  //   winner.clear();
+  //   FirebaseFirestore.instance
+  //       .collection('Products')
+  //       .doc(widget.productDetail.prodUid)
+  //       .collection('Biddings')
+  //       .doc(uid)
+  //       .get()
+  //       .then((value) {
+  //     winner.add(value.data());
+  //     setState(() {});
+  //   });
+  // }
+
+  // read bids
+  fetchBids() async {
+
+    await FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.productDetail.prodUid)
+        .collection('Biddings')
+        .where('bidStatus', isEqualTo: 'pending')
+        .snapshots()
+        .listen((event) {
+      if (event.docs.isNotEmpty) {
+        bidsList.clear();
+        event.docs.forEach((element) {
+          bidsList.add(element.data());
+        });
+        setState(() {
+          bidsList.sort((a, b) => b['bidPrice'].compareTo(a['bidPrice']));
+
+        });
+      }
+
+    });
+
+  }
 
   // ******* Get Location from Coordinates *******
   locationFromCordinates(Coordinates coordinates) async {
