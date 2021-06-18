@@ -70,7 +70,7 @@ class _ProductCardState extends State<ProductCard> {
                                       actions: [
                                         ElevatedButton(
                                           onPressed: () async {
-                                            removeFromBidding();
+                                            deleteProduct();
                                           },
                                           style: ElevatedButton.styleFrom(
                                               primary: Constant.btnWidgetColor),
@@ -275,10 +275,6 @@ class _ProductCardState extends State<ProductCard> {
 
 // Add to bid method
   Future<void> addToBidding({String prodUid}) async {
-    // await FirebaseFirestore.instance
-    //     .collection('Biddings')
-    //     .doc(prodUid)
-    //     .set({'totalBids': 0, 'prodUid': prodUid});
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(prodUid)
@@ -288,10 +284,14 @@ class _ProductCardState extends State<ProductCard> {
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)
-        .update({'prodStatus': 'bidding'}).then((value) => Get.back());
+        .update({
+      'prodStatus': 'bidding',
+      'prodBidding': 'true',
+      'biddingStatus': 'true'
+    }).then((value) => Get.back());
   }
 
-  Future<void> removeFromBidding() async {
+  Future<void> deleteProduct() async {
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)

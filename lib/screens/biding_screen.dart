@@ -10,9 +10,6 @@ import 'package:lets_exchange/model/product_model.dart';
 import 'package:lets_exchange/screens/BiddingItemScreen.dart';
 import 'package:lets_exchange/screens/bid_itemCard.dart';
 import 'package:lets_exchange/screens/my_products.dart';
-import 'package:lets_exchange/screens/product_details.dart';
-
-import 'package:lets_exchange/widgets/product_card.dart';
 
 class BiddingScreen extends StatefulWidget {
   @override
@@ -194,7 +191,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
   getbiddingProducts() async {
     FirebaseFirestore.instance
         .collection('Products')
-        .where('prodStatus', isEqualTo: 'bidding')
+        .where('prodBidding', isEqualTo: 'true')
         .snapshots()
         .listen((event) {
       bidsList.clear();

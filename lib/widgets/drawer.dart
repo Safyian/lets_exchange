@@ -73,20 +73,23 @@ class CustomDrawer extends StatelessWidget {
             InkWell(
               onTap: () {
                 ProductModel productModel = ProductModel(
-                    prodName: '',
-                    sellerName: '',
-                    prodUid: '',
-                    prodStatus: '',
-                    prodDescription: '',
-                    prodPrice: null,
-                    prodCatagory: null,
-                    prodImages: null,
-                    prodPostBy: '',
-                    prodDate: '',
-                    longitude: null,
-                    latitude: null,
-                    prodQuantity: null,
-                    favouriteBy: null);
+                  prodName: '',
+                  sellerName: '',
+                  prodUid: '',
+                  prodStatus: '',
+                  prodDescription: '',
+                  prodPrice: null,
+                  prodCatagory: null,
+                  prodImages: null,
+                  prodPostBy: '',
+                  prodDate: '',
+                  longitude: null,
+                  latitude: null,
+                  prodQuantity: null,
+                  favouriteBy: null,
+                  prodBidding: 'false',
+                  biddingStatus: 'end',
+                );
                 Get.to(AddProduct(productModel: productModel));
               },
               child: ListTile(

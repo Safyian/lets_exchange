@@ -495,6 +495,8 @@ class _AddProductState extends State<AddProduct> {
               prodDate: currentTime.toString(),
               prodPostBy: Constant.userId,
               favouriteBy: [],
+              prodBidding: 'false',
+              biddingStatus: 'end',
             );
             await FirebaseFirestore.instance
                 .collection('Products')
@@ -555,6 +557,8 @@ class _AddProductState extends State<AddProduct> {
             prodDate: widget.productModel.prodDate,
             prodPostBy: Constant.userId,
             favouriteBy: widget.productModel.favouriteBy,
+            prodBidding: 'false',
+            biddingStatus: 'end',
           );
           await FirebaseFirestore.instance
               .collection('Products')

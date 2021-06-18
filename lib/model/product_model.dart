@@ -9,6 +9,8 @@ class ProductModel {
   String prodDescription;
   double prodPrice;
   String prodCatagory;
+  String prodBidding;
+  String biddingStatus;
   List<String> prodImages;
 
   List<String> favouriteBy;
@@ -32,6 +34,8 @@ class ProductModel {
     @required this.latitude,
     @required this.prodQuantity,
     @required this.favouriteBy,
+    @required this.prodBidding,
+    @required this.biddingStatus,
   });
 
   Map<String, dynamic> toMap() {
@@ -50,6 +54,8 @@ class ProductModel {
       'longitude': longitude,
       'latitude': latitude,
       'prodQuantity': prodQuantity,
+      'prodBidding': prodBidding,
+      'biddingStatus': biddingStatus,
     };
   }
 
@@ -69,6 +75,8 @@ class ProductModel {
       longitude: map['longitude'],
       latitude: map['latitude'],
       prodQuantity: map['prodQuantity'],
+      prodBidding: map['prodBidding'],
+      biddingStatus: map['biddingStatus'],
     );
   }
 }

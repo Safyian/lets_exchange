@@ -190,15 +190,30 @@ class _BidCardState extends State<BidCard> {
               height: Get.height * 0.01,
             ),
             // ********* Product Price Text ********
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                '${Services().formateMoney(widget.prodList.prodPrice)}',
-                style: GoogleFonts.roboto(
-                    color: Colors.orange[800],
-                    fontWeight: FontWeight.bold,
-                    fontSize: Get.width * 0.035),
-              ),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(
+                    '${Services().formateMoney(widget.prodList.prodPrice)}',
+                    style: GoogleFonts.roboto(
+                        color: Colors.orange[800],
+                        fontWeight: FontWeight.bold,
+                        fontSize: Get.width * 0.035),
+                  ),
+                ),
+                Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text(
+                    widget.prodList.biddingStatus == 'true' ? 'ACTIVE' : 'END',
+                    style: GoogleFonts.roboto(
+                        color: Colors.orange[800],
+                        fontWeight: FontWeight.w600,
+                        fontSize: Get.width * 0.03),
+                  ),
+                ),
+              ],
             ),
             SizedBox(
               height: Get.height * 0.01,
@@ -247,7 +262,11 @@ class _BidCardState extends State<BidCard> {
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)
-        .update({'prodStatus': 'pending'}).then((value) => Get.back());
+        .update({
+      'prodBidding': 'false',
+      'prodStatus': 'pending',
+      'biddingStatus': 'end'
+    }).then((value) => Get.back());
     await FirebaseFirestore.instance
         .collection('Products')
         .doc(widget.prodList.prodUid)

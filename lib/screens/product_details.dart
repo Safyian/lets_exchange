@@ -29,6 +29,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _current = 0;
   bool favIcon;
   bool exCheck = false;
+  bool buyCheck = false;
   String address;
   String date;
   String duration;
@@ -82,6 +83,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ? true
         : false;
     checkExchangeReq();
+    checkBuyReq();
     super.initState();
   }
 
@@ -358,9 +360,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: ElevatedButton(
-                      onPressed: () {
-                        _showBuyDialog(model: widget.productDetail);
-                      },
+                      onPressed: buyCheck
+                          ? null
+                          : () {
+                              _showBuyDialog(model: widget.productDetail);
+                            },
                       style: ElevatedButton.styleFrom(
                         primary: Constant.btnWidgetColor,
                         shape: RoundedRectangleBorder(
@@ -796,6 +800,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         .listen((event) {
       print('event = ${event.docs.isNotEmpty}');
       exCheck = event.docs.isNotEmpty;
+      setState(() {});
+    });
+  }
+
+  //check exchange button
+  checkBuyReq() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.productDetail.prodPostBy)
+        .collection('BuyerRequests')
+        .where('buyerUid', isEqualTo: Constant.userId)
+        .where('productUid', isEqualTo: widget.productDetail.prodUid)
+        .snapshots()
+        .listen((event) {
+      print('event = ${event.docs.isNotEmpty}');
+      buyCheck = event.docs.isNotEmpty;
       setState(() {});
     });
   }
