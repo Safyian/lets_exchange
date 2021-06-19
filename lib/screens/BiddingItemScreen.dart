@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -421,6 +423,10 @@ class _BiddingItemScreenState extends State<BiddingItemScreen> {
       'bidStatus': 'pending',
       'isWinner': 'false',
     }, SetOptions(merge: true));
+    _createNotification(
+        uid: widget.productDetail.prodPostBy,
+        heading: 'NEW BID',
+        content: '${Constant.userName} Bid Rs. $bidPrice on your Product');
   }
 
 // accept bid method
@@ -461,6 +467,10 @@ class _BiddingItemScreenState extends State<BiddingItemScreen> {
           ? 0
           : (widget.productDetail.prodQuantity - 1)
     });
+    _createNotification(
+        uid: uid,
+        heading: 'Bid Won',
+        content: 'CONGRATULATIONS! your Bid is accepted');
   }
 
   // read bids
@@ -670,6 +680,29 @@ class _BiddingItemScreenState extends State<BiddingItemScreen> {
                   fontSize: Get.width * 0.04, fontWeight: FontWeight.w600)),
         )
       ],
+    );
+  }
+
+  // push notification
+  _createNotification({String heading, String uid, String content}) async {
+    var res = await http.post(
+      'https://onesignal.com/api/v1/notifications',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization":
+            "Basic ZGM1MzU4YzgtNzIyNi00ZDA5LThiYzUtNDNmMzYyM2YxYTYy"
+      },
+      body: json.encode({
+        'app_id': "23ef2e1f-3ed9-474f-9975-d56982cbc641",
+        'headings': {"en": heading},
+        'contents': {"en": content},
+        // 'contents': {"en": 'I need a Drink'},
+        'included_segments': ["Subscribed Users"],
+        "filters": [
+          {"field": "tag", "key": 'uid', "relation": "=", "value": "$uid"},
+          {"field": "tag", "key": 'push', "relation": "=", "value": "yes"}
+        ],
+      }),
     );
   }
 }

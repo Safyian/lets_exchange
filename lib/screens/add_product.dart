@@ -452,24 +452,6 @@ class _AddProductState extends State<AddProduct> {
                 ),
               ],
             );
-            //
-            // //Create a reference to the location you want to upload to in firebase
-            // Reference reference = FirebaseStorage.instance
-            //     .ref()
-            //     .child('pictures')
-            //     .child(DateTime.now().millisecondsSinceEpoch.toString());
-
-            // //Upload the file to firebase
-            // imageUploadTask = reference.putFile(_prodCoverImg);
-
-            // // Waits till the file is uploaded then stores the download url
-            // await imageUploadTask.whenComplete(() {
-            //   print('image uploaded');
-            // });
-            // // getting image url
-            // reference.getDownloadURL().then((url) async {
-            //   image = url.toString();
-
             for (var imageFile in images) {
               await Services().postImage(imageFile).then((downloadUrl) {
                 imageUrls.add(downloadUrl.toString());

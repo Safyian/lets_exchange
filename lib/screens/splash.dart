@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/screens/login.dart';
 import 'package:lets_exchange/widgets/bottom_navBar.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

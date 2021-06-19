@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/screens/login.dart';
 import 'package:lets_exchange/widgets/bottom_navBar.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Authentication {
   static FirebaseAuth _auth = FirebaseAuth.instance;
@@ -57,6 +58,8 @@ class Authentication {
               'image': image,
               'email': email,
             });
+            // set tags for One Signal Push Notifivation
+            await OneSignal.shared.sendTags({"uid": user.uid, "push": "yes"});
             Constant.userName = name;
             Constant.userEmail = email;
             Constant.userId = user.uid;
@@ -108,6 +111,8 @@ class Authentication {
           Constant.userName = value.data()['name'];
           Constant.userImage = value.data()['image'];
         });
+        // set tags for One Signal Push Notifivation
+        await OneSignal.shared.sendTags({"uid": user.uid, "push": "yes"});
         //
         Get.back();
         Get.offAll(BottomNavBar());

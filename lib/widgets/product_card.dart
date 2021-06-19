@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -273,6 +275,29 @@ class _ProductCardState extends State<ProductCard> {
     }
   }
 
+// push notification
+  _createNotification({String heading, String uid, String content}) async {
+    var res = await http.post(
+      'https://onesignal.com/api/v1/notifications',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization":
+            "Basic ZGM1MzU4YzgtNzIyNi00ZDA5LThiYzUtNDNmMzYyM2YxYTYy"
+      },
+      body: json.encode({
+        'app_id': "23ef2e1f-3ed9-474f-9975-d56982cbc641",
+        'headings': {"en": heading},
+        'contents': {"en": content},
+        // 'contents': {"en": 'I need a Drink'},
+        'included_segments': ["Subscribed Users"],
+        "filters": [
+          // {"field": "tag", "key": 'uid', "relation": "=", "value": "$uid"},
+          {"field": "tag", "key": 'push', "relation": "=", "value": "yes"}
+        ],
+      }),
+    );
+  }
+
 // Add to bid method
   Future<void> addToBidding({String prodUid}) async {
     await FirebaseFirestore.instance
@@ -289,6 +314,9 @@ class _ProductCardState extends State<ProductCard> {
       'prodBidding': 'true',
       'biddingStatus': 'true'
     }).then((value) => Get.back());
+    _createNotification(
+        heading: 'New Item added in Bidding',
+        content: 'Starting Rs. ${widget.prodList.prodPrice}');
   }
 
   Future<void> deleteProduct() async {

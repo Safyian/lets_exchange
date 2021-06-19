@@ -49,10 +49,18 @@ dependencies:
   search_map_place: ^0.3.0
   modal_progress_hud: ^0.1.3
   intl:
+  onesignal_flutter: ^3.0.0
+  http: ^0.12.0+4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.8.0"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/ex_logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

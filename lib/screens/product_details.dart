@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -706,6 +708,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     setState(() {});
   }
 
+//
+// push notification
+  _createNotification({String heading, String uid, String content}) async {
+    var res = await http.post(
+      'https://onesignal.com/api/v1/notifications',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization":
+            "Basic ZGM1MzU4YzgtNzIyNi00ZDA5LThiYzUtNDNmMzYyM2YxYTYy"
+      },
+      body: json.encode({
+        'app_id': "23ef2e1f-3ed9-474f-9975-d56982cbc641",
+        'headings': {"en": heading},
+        'contents': {"en": content},
+        // 'contents': {"en": 'I need a Drink'},
+        'included_segments': ["Subscribed Users"],
+        "filters": [
+          {"field": "tag", "key": 'uid', "relation": "=", "value": "$uid"},
+          {"field": "tag", "key": 'push', "relation": "=", "value": "yes"}
+        ],
+      }),
+    );
+  }
+
 // buy now method
   buyNow() async {
     String reqUid = DateTime.now().millisecondsSinceEpoch.toString();
@@ -726,6 +752,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       'quantity': widget.productDetail.prodQuantity,
       'buyerName': Constant.userName,
     });
+    _createNotification(
+        uid: widget.productDetail.prodPostBy,
+        heading: 'New Buy Request',
+        content:
+            '${Constant.userName} wants to Buy your Product ${widget.productDetail.prodName}');
     Get.back();
   }
 
@@ -778,6 +809,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             'exchangeProductDetails': productDetails,
             'exchangeProductImg': image,
           });
+          _createNotification(
+              uid: widget.productDetail.prodPostBy,
+              heading: 'New Exchange Request',
+              content:
+                  '${Constant.userName} wants to Exchange with your Product');
           Get.back();
 
           Authentication.showError(

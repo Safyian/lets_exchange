@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lets_exchange/const/const.dart';
 import 'package:lets_exchange/model/exchange_model.dart';
 import 'package:lets_exchange/screens/chat_screen.dart';
+import 'package:http/http.dart' as http;
 
 class ExchangeScreen extends StatefulWidget {
   @override
@@ -346,6 +349,10 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
         }
       });
     });
+    _createNotification(
+        uid: reqUid,
+        heading: 'Exchange Request Accepted',
+        content: '${Constant.userName} accepted your Exchange Request');
   }
 
   // cancel deal
@@ -358,5 +365,28 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
         .collection('ExchangeRequests')
         .doc(reqUid)
         .update({'status': 'cancel'});
+  }
+
+  // push notification
+  _createNotification({String heading, String uid, String content}) async {
+    var res = await http.post(
+      'https://onesignal.com/api/v1/notifications',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization":
+            "Basic ZGM1MzU4YzgtNzIyNi00ZDA5LThiYzUtNDNmMzYyM2YxYTYy"
+      },
+      body: json.encode({
+        'app_id': "23ef2e1f-3ed9-474f-9975-d56982cbc641",
+        'headings': {"en": heading},
+        'contents': {"en": content},
+        // 'contents': {"en": 'I need a Drink'},
+        'included_segments': ["Subscribed Users"],
+        "filters": [
+          {"field": "tag", "key": 'uid', "relation": "=", "value": "$uid"},
+          {"field": "tag", "key": 'push', "relation": "=", "value": "yes"}
+        ],
+      }),
+    );
   }
 }
